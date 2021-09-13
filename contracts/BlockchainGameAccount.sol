@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity 0.8.7;
 
-import {IERC721} from "./external/IERC721.sol";
+import "@OpenZeppelin/utils/structs/EnumerableSet.sol";
+import "@OpenZeppelin/token/ERC721/IERC721.sol";
 
 error NotAuthorized(address needed, address found);
 error CallReverted(address target, bool delegate, bytes data, bytes errorData);
@@ -10,10 +11,15 @@ error ProfileValid();
 /// @title State variables for a GameAccount
 /// @dev keep the state here so making contracts that delegatecall to change state are easy to write
 abstract contract GameAccountStorage {
+    /// @dev don't forget this on the inheriting contracts!
+    using EnumerableSet for EnumerableSet.AddressSet;
+
     /// @dev the contract owner
-    address internal player;
+    address internal playerOne;
     /// @dev the next owner (if a hand off is in progress)
-    address internal nextPlayer;
+    address internal nextPlayerOne;
+
+    EnumerableSet.AddressSet internal guestPlayers;
 
     /// @dev The account's name
     string internal name;
@@ -27,6 +33,7 @@ abstract contract GameAccountStorage {
 /// @title A NFT-owning contract for playing blockchain games
 /// @author Bryan Stitt <bryan@satoshiandkin.com>
 contract GameAccount is GameAccountStorage {
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     struct Call {
         address target;
@@ -38,8 +45,12 @@ contract GameAccount is GameAccountStorage {
         bytes returnData;
     }
 
-    event HandOffOwnership(address player, address nextPlayer);
-    event ReceiveOwnership(address oldPlayer, address player);
+    event HandOffOwnership(address playerOne, address nextPlayerOne);
+    event ReceiveOwnership(address oldPlayerOne, address playerOne);
+
+    event AddGuestPlayer(address guest);
+    event RemoveGuestPlayer(address guest);
+
     event SetName(string);
     event SetContact(string);
     event SetProfile(address erc721token, uint tokenId, address who);
@@ -48,24 +59,33 @@ contract GameAccount is GameAccountStorage {
     // Primary functions
     //
 
-    constructor(address _player) {
+    constructor(address[] memory _players) {
         // TODO: delegatecall proxy instead of per-player contract
 
+        uint playersLength = _players.length;
+
+        require(_players.length > 0, "!players");
+
         // all the state is in GameAccountStorage
-        player = _player;
+        playerOne = _players[0];
+
+        for (uint i = 1; i < playersLength; i++) {
+            guestPlayers.add(_players[i]);
+        }
     }
 
     modifier auth() {
-        if (msg.sender != player) {
-            revert NotAuthorized(player, msg.sender);
+        if (msg.sender != playerOne || !guestPlayers.contains(msg.sender)) {
+            revert NotAuthorized(playerOne, msg.sender);
         }
         _;
     }
 
     /// @notice Play a blockchhain game by combining one or more transactions
     function play(Call[] memory calls) auth external returns (bytes[] memory returnData) {
-        returnData = new bytes[](calls.length);
         uint callsLength = calls.length;
+
+        returnData = new bytes[](callsLength);
         bytes memory ret;
         bool success;
 
@@ -86,8 +106,9 @@ contract GameAccount is GameAccountStorage {
     // Profile functions
     //
 
-    function getNextPlayer() external view returns (address) {
-        return nextPlayer;
+    function getNextPlayerOne() external view returns (address) {
+        require(nextPlayerOne != address(0));
+        return nextPlayerOne;
     }
 
     function profile() external view returns (address player, string memory, string memory, address, uint) {
@@ -163,22 +184,22 @@ contract GameAccount is GameAccountStorage {
 
     /// @dev Begin the process of transferring ownership of this contract
     /// @dev call with `address(0)` to cancel
-    function handOffOwnership(address _nextPlayer) auth external {
-        nextPlayer = _nextPlayer;
+    function handOffOwnership(address _nextPlayerOne) auth external {
+        nextPlayerOne = _nextPlayerOne;
 
-        emit HandOffOwnership(player, _nextPlayer);
+        emit HandOffOwnership(playerOne, _nextPlayerOne);
     }
 
     /// @dev Complete the process of transferring ownership of this contract
     function receiveOwership() external {
-        // like `auth` but check nextPlayer
-        if (msg.sender != nextPlayer) {
-            revert NotAuthorized(nextPlayer, msg.sender);
+        // like `auth` but check nextPlayerOne
+        if (msg.sender != nextPlayerOne) {
+            revert NotAuthorized(nextPlayerOne, msg.sender);
         }
 
-        emit ReceiveOwnership(player, nextPlayer);
+        emit ReceiveOwnership(playerOne, nextPlayerOne);
 
-        player = nextPlayer;
-        nextPlayer = address(0);
+        playerOne = nextPlayerOne;
+        nextPlayerOne = address(0);
     }
 }
