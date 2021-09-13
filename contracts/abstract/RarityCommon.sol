@@ -2,6 +2,7 @@
 pragma solidity 0.8.7;
 
 import {IRarity} from "contracts/external/rarity/IRarity.sol";
+import {IRarityAdventure} from "contracts/external/rarity/IRarityAdventure.sol";
 import {IRarityAttributes} from "contracts/external/rarity/IRarityAttributes.sol";
 import {IRarityGold} from "contracts/external/rarity/IRarityGold.sol";
 import {IRaritySkills} from "contracts/external/rarity/IRaritySkills.sol";
