@@ -8,18 +8,18 @@ error NotAuthorized(address needed, address found);
 error CallReverted(address target, bool delegate, bytes data, bytes errorData);
 error ProfileValid();
 
-/// @title State variables for a GameAccount
+/// @title State variables for a Guild
 /// @dev keep the state here so making contracts that delegatecall to change state are easy to write
-abstract contract GameAccountStorage {
+abstract contract GuildStorage {
     /// @dev don't forget this on the inheriting contracts!
     using EnumerableSet for EnumerableSet.AddressSet;
 
     /// @dev the contract owner
-    address internal playerOne;
+    address internal guildLeader;
     /// @dev the next owner (if a hand off is in progress)
-    address internal nextPlayerOne;
+    address internal oldGuildLeader;
 
-    EnumerableSet.AddressSet internal guestPlayers;
+    EnumerableSet.AddressSet internal guildPlayers;
 
     /// @dev The account's name
     string internal name;
@@ -32,7 +32,7 @@ abstract contract GameAccountStorage {
 
 /// @title A NFT-owning contract for playing blockchain games
 /// @author Bryan Stitt <bryan@satoshiandkin.com>
-contract GameAccount is GameAccountStorage {
+contract Guild is GuildStorage {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     struct Call {
@@ -45,8 +45,8 @@ contract GameAccount is GameAccountStorage {
         bytes returnData;
     }
 
-    event HandOffOwnership(address playerOne, address nextPlayerOne);
-    event ReceiveOwnership(address oldPlayerOne, address playerOne);
+    event HandOffOwnership(address guildLeader, address oldGuildLeader);
+    event ReceiveOwnership(address oldPlayerOne, address guildLeader);
 
     event AddGuestPlayer(address guest);
     event RemoveGuestPlayer(address guest);
@@ -67,16 +67,16 @@ contract GameAccount is GameAccountStorage {
         require(_players.length > 0, "!players");
 
         // all the state is in GameAccountStorage
-        playerOne = _players[0];
+        guildLeader = _players[0];
 
         for (uint i = 1; i < playersLength; i++) {
-            guestPlayers.add(_players[i]);
+            guildPlayers.add(_players[i]);
         }
     }
 
     modifier auth() {
-        if (msg.sender != playerOne || !guestPlayers.contains(msg.sender)) {
-            revert NotAuthorized(playerOne, msg.sender);
+        if (msg.sender != guildLeader || !guildPlayers.contains(msg.sender)) {
+            revert NotAuthorized(guildLeader, msg.sender);
         }
         _;
     }
@@ -107,8 +107,8 @@ contract GameAccount is GameAccountStorage {
     //
 
     function getNextPlayerOne() external view returns (address) {
-        require(nextPlayerOne != address(0));
-        return nextPlayerOne;
+        require(oldGuildLeader != address(0));
+        return oldGuildLeader;
     }
 
     function profile() external view returns (address player, string memory, string memory, address, uint) {
@@ -184,22 +184,22 @@ contract GameAccount is GameAccountStorage {
 
     /// @dev Begin the process of transferring ownership of this contract
     /// @dev call with `address(0)` to cancel
-    function handOffOwnership(address _nextPlayerOne) auth external {
-        nextPlayerOne = _nextPlayerOne;
+    function handOffOwnership(address _oldGuildLeader) auth external {
+        oldGuildLeader = _oldGuildLeader;
 
-        emit HandOffOwnership(playerOne, _nextPlayerOne);
+        emit HandOffOwnership(guildLeader, _oldGuildLeader);
     }
 
     /// @dev Complete the process of transferring ownership of this contract
     function receiveOwership() external {
-        // like `auth` but check nextPlayerOne
-        if (msg.sender != nextPlayerOne) {
-            revert NotAuthorized(nextPlayerOne, msg.sender);
+        // like `auth` but check oldGuildLeader
+        if (msg.sender != oldGuildLeader) {
+            revert NotAuthorized(oldGuildLeader, msg.sender);
         }
 
-        emit ReceiveOwnership(playerOne, nextPlayerOne);
+        emit ReceiveOwnership(guildLeader, oldGuildLeader);
 
-        playerOne = nextPlayerOne;
-        nextPlayerOne = address(0);
+        guildLeader = oldGuildLeader;
+        oldGuildLeader = address(0);
     }
 }
