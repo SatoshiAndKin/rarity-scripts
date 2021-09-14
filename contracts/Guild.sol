@@ -102,7 +102,7 @@ contract Guild is Owned {
     // Primary functions
     //
 
-    /// @notice Play a blockchhain game by combining one or more transactions
+    /// @notice Play a blockchain game by combining one or more transactions
     function play(Call[] memory calls) authSender external returns (bytes[] memory returnData) {
         uint callsLength = calls.length;
 
