@@ -1,0 +1,14 @@
+// is NonPlayerCharacters
+pragma solidity 0.8.7;
+
+import {NonPlayerCharacters} from "contracts/abstract/NonPlayerCharacters.sol";
+
+contract CraftMaterials1 is NonPlayerCharacters {
+
+    function act(uint numAdventures) external {
+        // TODO: adaventure to collect crafting materials
+        revert("under construction");
+    }
+
+    // TODO: setup npcs to be STR+CON barbarnas
+}
