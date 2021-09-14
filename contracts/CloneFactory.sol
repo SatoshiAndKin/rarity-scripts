@@ -10,22 +10,8 @@ contract CloneFactory {
 
     event NewClone(address indexed clone, address indexed target, bytes32 salt);
 
-    function cloneTarget(address target, bytes32 salt, bytes calldata initData)
-        external payable returns (address clone)
-    {
-        bytes32 pepper;
-        
-        if (initData.length > 0) {
-            pepper = keccak256(abi.encodePacked(salt, initData));
-        } else{
-            pepper = salt;
-        }
-
-        clone = target.cloneDeterministic(pepper);
-        emit NewClone(clone, target, pepper);
-
-        if (initData.length > 0) {
-            (bool success, ) = target.call(abi.encodeWithSignature("initialize(bytes)", initData));
-        }
+    function cloneTarget(address target, bytes32 salt) external payable returns (address clone) {
+        clone = target.cloneDeterministic(salt);
+        emit NewClone(clone, target, salt);
     }
 }

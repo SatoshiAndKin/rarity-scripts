@@ -23,7 +23,7 @@ abstract contract RarityCommon {
         return (spender == summoner_owner || RARITY.getApproved(summoner) == spender || RARITY.isApprovedForAll(summoner_owner, spender));
     }
 
-    modifier auth(uint summoner) {
+    modifier authSummoner(uint summoner) {
         if (!_isApprovedOrOwner(msg.sender, summoner)) {
             revert NotApprovedOrOwner(msg.sender, summoner);
         }

@@ -16,16 +16,23 @@ error NotAuthorized(address needed, address found);
 
 /// @title A NFT-owning contract for playing blockchain games
 /// @author Bryan Stitt <bryan@satoshiandkin.com>
-contract Owned {
+abstract contract Owned {
+
     event HandOffOwnership(address owner, address nextOwner);
     event ReceiveOwnership(address oldOwner, address owner);
 
-    constructor(address _owner) {
+    address private owner;
+    address private nextOwner;
+    bool private initialized;
+
+    function initialize(address _owner) internal {
+        require(initialized == false, "!initialize");
+
         owner = _owner;
     }
 
-    modifier auth() {
-        if (msg.sender != owner || !guildPlayers.contains(msg.sender)) {
+    modifier authSender() {
+        if (msg.sender != owner) {
             revert NotAuthorized(owner, msg.sender);
         }
         _;
@@ -33,7 +40,7 @@ contract Owned {
 
     /// @dev Begin the process of transferring ownership of this contract
     /// @dev call with `address(0)` to cancel
-    function handOffOwnership(address _nextOwner) auth external {
+    function handOffOwnership(address _nextOwner) authSender external {
         nextOwner = _nextOwner;
 
         emit HandOffOwnership(owner, _nextOwner);
@@ -41,7 +48,7 @@ contract Owned {
 
     /// @dev Complete the process of transferring ownership of this contract
     function receiveOwership() external {
-        // like `auth` but check nextOwner
+        // like `authSender` but check msg.sender againt nextOwner instead of owner
         if (msg.sender != nextOwner) {
             revert NotAuthorized(nextOwner, msg.sender);
         }

@@ -12,7 +12,11 @@ contract RarityActionsV2 is RarityCommon {
     function adventure(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
-            RARITY.adventure(summoners[i]);
+            try RARITY.adventure(summoners[i]) {
+                // it worked       
+            } catch (bytes memory /*lowLevelData*/) {
+                // it failed
+            }
         }
     }
 
@@ -26,12 +30,15 @@ contract RarityActionsV2 is RarityCommon {
     function approveGold(uint[] calldata summoners, uint spender) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
-            RARITY_GOLD.approve(summoners[i], spender);
+            RARITY_GOLD.approve(summoners[i], spender, 2 ** 256 - 1);
         }
     }
 
     function craft(uint[] calldata summoners, uint spender) external {
-        
+        uint length = summoners.length;
+        for (uint i = 0; i < length; i++) {
+            revert("under construction");
+        }
     }
 
     function distantAdventure(uint[] calldata summoners, IRarityAdventure quest) external {
@@ -71,7 +78,7 @@ contract RarityActionsV2 is RarityCommon {
     function increaseIntelligence(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
-            RARITY_ATTRIBUTES.increase_intelligencec(summoners[i]);
+            RARITY_ATTRIBUTES.increase_intelligence(summoners[i]);
         }
     }
 

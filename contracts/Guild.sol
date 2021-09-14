@@ -9,38 +9,17 @@
  */
 pragma solidity 0.8.7;
 
+import "./Errors.sol";
+
 import "@OpenZeppelin/utils/structs/EnumerableSet.sol";
 import "@OpenZeppelin/token/ERC721/IERC721.sol";
 
-error NotAuthorized(address needed, address found);
-error CallReverted(address target, bool delegate, bytes data, bytes errorData);
-error ProfileValid();
-
-/// @title State variables for a Guild
-/// @dev keep the state here so making contracts that delegatecall to change state are easy to write
-abstract contract GuildStorage {
-    /// @dev don't forget this on the inheriting contracts!
-    using EnumerableSet for EnumerableSet.AddressSet;
-
-    /// @dev the contract owner
-    address internal guildLeader;
-    /// @dev the next owner (if a hand off is in progress)
-    address internal nextGuildLeader;
-
-    EnumerableSet.AddressSet internal guildPlayers;
-
-    /// @dev The account's name
-    string internal name;
-    /// @dev The account's contact info
-    string internal contact;
-    /// @dev The account's profile picture (plus whatever metadata)
-    IERC721 internal erc721ProfileToken;
-    uint internal erc721ProfileId;
-}
+import {CloneFactory} from "./CloneFactory.sol";
+import {Owned} from "./abstract/Owned.sol";
 
 /// @title A NFT-owning contract for playing blockchain games
 /// @author Bryan Stitt <bryan@satoshiandkin.com>
-contract Guild is GuildStorage {
+contract Guild is Owned {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     struct Call {
@@ -53,44 +32,78 @@ contract Guild is GuildStorage {
         bytes returnData;
     }
 
-    event HandOffOwnership(address guildLeader, address nextGuildLeader);
-    event ReceiveOwnership(address oldGuildLeader, address guildLeader);
-
-    event AddGuestPlayer(address guest);
-    event RemoveGuestPlayer(address guest);
+    event AddMember(address guest);
+    event RemoveMember(address guest);
 
     event SetName(string);
     event SetContact(string);
     event SetProfile(address erc721token, uint tokenId, address who);
 
     //
+    // game state and immutables
+    //
+
+    EnumerableSet.AddressSet internal members;
+
+    /// @dev The guild's name
+    string public name;
+    /// @dev The guild's contact info
+    string public contact;
+    /// @dev The guild's profile picture (plus whatever metadata)
+    IERC721 public erc721ProfileToken;
+    uint public erc721ProfileId;
+
+    //
+    // non-game state and immutables
+    //
+
+    /// @dev A contract used to clone contracts
+    CloneFactory private immutable cloneFactory;
+    /// @dev This contract has been initialized
+    bool private initialized;
+    /// @dev The original address of this contract
+    address private immutable original;
+    
+    //
+    // Setup functions
+    //
+
+    /// @notice a mostly empty constructor. use createNewGuild to actually make a place.
+    constructor(CloneFactory _cloneFactory) {
+        // non-game immutables
+        cloneFactory = _cloneFactory;
+        // save this address in the bytecode so that we can check for delegatecalls
+        original = address(this);
+    }
+
+    function initialize(address owner, address[] calldata _members) external {
+        require(address(this) != original, "!delegatecall");
+        require(!initialized, "!initialize");
+
+        initialized = true;
+
+        Owned.initialize(owner);
+
+        uint membersLength = _members.length;
+        for (uint i = 1; i < membersLength; i++) {
+            members.add(_members[i]);
+        }
+    }
+    
+    function newGuild(address _owner, address[] calldata _members, bytes32 salt) external returns (address guild) {
+        require(address(this) == original, "!original");
+
+        guild = cloneFactory.cloneTarget(address(this), salt);
+
+        Guild(guild).initialize(_owner, _members);
+    }
+
+    //
     // Primary functions
     //
 
-    constructor(address[] memory _players) {
-        // TODO: delegatecall proxy instead of per-player contract
-
-        uint playersLength = _players.length;
-
-        require(_players.length > 0, "!players");
-
-        // all the state is in GameAccountStorage
-        guildLeader = _players[0];
-
-        for (uint i = 1; i < playersLength; i++) {
-            guildPlayers.add(_players[i]);
-        }
-    }
-
-    modifier auth() {
-        if (msg.sender != guildLeader || !guildPlayers.contains(msg.sender)) {
-            revert NotAuthorized(guildLeader, msg.sender);
-        }
-        _;
-    }
-
     /// @notice Play a blockchhain game by combining one or more transactions
-    function play(Call[] memory calls) auth external returns (bytes[] memory returnData) {
+    function play(Call[] memory calls) authSender external returns (bytes[] memory returnData) {
         uint callsLength = calls.length;
 
         returnData = new bytes[](callsLength);
@@ -114,28 +127,23 @@ contract Guild is GuildStorage {
     // Profile functions
     //
 
-    function getNextPlayerOne() external view returns (address) {
-        require(nextGuildLeader != address(0));
-        return nextGuildLeader;
-    }
-
     function profile() external view returns (address player, string memory, string memory, address, uint) {
         return (player, name, contact, address(erc721ProfileToken), erc721ProfileId);
     }
 
-    function setName(string calldata _name) auth external {
+    function setName(string calldata _name) authSender external {
         name = _name;
 
         emit SetName(_name);
     }
 
-    function setContact(string calldata _contact) auth external {
+    function setContact(string calldata _contact) authSender external {
         contact = _contact;
 
         emit SetContact(_contact);
     }
 
-    function setProfile(IERC721 erc721Token, uint erc721TokenId) auth external {
+    function setProfile(IERC721 erc721Token, uint erc721TokenId) authSender external {
         address profileOwner = erc721Token.ownerOf(erc721TokenId);
         if (profileOwner != address(this)) {
             revert NotAuthorized(address(this), profileOwner);
@@ -186,30 +194,5 @@ contract Guild is GuildStorage {
                 interfaceID == 0x80ac58cd ||    // ERC-721 TokenReceiver support
                 interfaceID == 0x4e2312e0       // ERC-1155 TokenReceiver support
         ;
-    }
-
-    //
-    // Ownership
-    //
-
-    /// @dev Begin the process of transferring ownership of this contract
-    /// @dev call with `address(0)` to cancel
-    function handOffOwnership(address _nextGuildLeader) auth external {
-        nextGuildLeader = _nextGuildLeader;
-
-        emit HandOffOwnership(guildLeader, _nextGuildLeader);
-    }
-
-    /// @dev Complete the process of transferring ownership of this contract
-    function receiveOwership() external {
-        // like `auth` but check nextGuildLeader
-        if (msg.sender != nextGuildLeader) {
-            revert NotAuthorized(nextGuildLeader, msg.sender);
-        }
-
-        emit ReceiveOwnership(guildLeader, nextGuildLeader);
-
-        guildLeader = nextGuildLeader;
-        nextGuildLeader = address(0);
     }
 }
