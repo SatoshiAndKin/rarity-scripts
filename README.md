@@ -13,6 +13,7 @@ Run the following in your terminal:
 
 Run the following in your terminal:
 
+    ./venv/bin/brownie run rarity main /help
 
 ## Todo
 

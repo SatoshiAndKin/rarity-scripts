@@ -16,21 +16,21 @@ def main(*args):
     """Run the click app."""
     click_log.basic_config(logger)
 
-    # https://click.palletsprojects.com/en/8.0.x/exceptions/#what-if-i-don-t-want-that
-    ctx = rarity_cli.make_context(
-        "brownie run rarity main",
-        list(args),
-        auto_envvar_prefix="RARITY",
-        help_option_names=['/h', '/help'],
-    )
+    try:
+        # https://click.palletsprojects.com/en/8.0.x/exceptions/#what-if-i-don-t-want-that
+        ctx = rarity_cli.make_context(
+            "brownie run rarity main",
+            list(args),
+            auto_envvar_prefix="RARITY",
+            help_option_names=['/h', '/help'],
+        )
 
-    with ctx:
-        try:
+        with ctx:
             rarity_cli.invoke(ctx)
-        except click.exceptions.Exit as e:
-            # we are inside brownie and we don't want to exit with an ugly error
-            if e.exit_code != 0:
-                raise
+    except Exception as e:
+        # we are inside `brownie run` and we don't want it to exit with an ugly error
+        if e.exit_code != 0:
+            raise
 
 
 @click.group()
@@ -76,7 +76,6 @@ def console(ctx):
     import IPython
 
     extra_locals = {
-        # "ApeSafe": ApeSafe,
         "account": ctx.obj["account"],
         "brownie": brownie,
         "chain": brownie.chain,
