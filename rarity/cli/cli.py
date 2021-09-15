@@ -5,6 +5,7 @@ import arrow
 import brownie
 import click
 import click_log
+import lazy_load
 
 from rarity.gas_strategy import MinimumGasStrategy
 
@@ -15,12 +16,21 @@ def main(*args):
     """Run the click app."""
     click_log.basic_config(logger)
 
-    rarity_cli.main(
-        args,
+    # https://click.palletsprojects.com/en/8.0.x/exceptions/#what-if-i-don-t-want-that
+    ctx = rarity_cli.make_context(
+        "brownie run rarity main",
+        list(args),
         auto_envvar_prefix="RARITY",
-        prog_name="brownie run rarity main",
-        standalone_mode=False,
+        help_option_names=['/h', '/help'],
     )
+
+    with ctx:
+        try:
+            rarity_cli.invoke(ctx)
+        except click.exceptions.Exit as e:
+            # we are inside brownie and we don't want to exit with an ugly error
+            if e.exit_code != 0:
+                raise
 
 
 @click.group()
@@ -37,9 +47,7 @@ def rarity_cli(ctx, account, gas_time, gas_extra):
     last_block = brownie.chain[-1]
     print("Last block:", last_block.number, arrow.get(last_block.timestamp).humanize(), "\n")
 
-    account = brownie.accounts.load(account)
-
-    print("\nHello,", account, "\n")
+    account = lazy_load.lazy(lambda: brownie.accounts.load(account))
 
     gas_strat = MinimumGasStrategy(gas_time, gas_extra)
 
