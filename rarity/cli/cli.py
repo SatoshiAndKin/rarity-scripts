@@ -35,19 +35,23 @@ def main(*args):
 
 @click.group()
 @click.option("/account", prompt=True)
+@click.option("/password", prompt=True, hide_input=True)
 @click.option("/gas-time", default=60)
 @click.option("/gas-extra", default="1 gwei")
 @click.pass_context
-def rarity_cli(ctx, account, gas_time, gas_extra):
+def rarity_cli(ctx, account, gas_time, gas_extra, password):
     """Command line interface for Rarity."""
     assert brownie.chain.id == 250, "not Fantom network!"
+
+    # TODO: wait to load this
+    brownie_account = brownie.accounts.load(account, password=password)
+
+    print(f"Hello, {brownie_account}!\n")
 
     print("\nConnected to", brownie.web3.provider.endpoint_uri)
 
     last_block = brownie.chain[-1]
     print("Last block:", last_block.number, arrow.get(last_block.timestamp).humanize(), "\n")
-
-    account = lazy_load.lazy(lambda: brownie.accounts.load(account))
 
     gas_strat = MinimumGasStrategy(gas_time, gas_extra)
 
