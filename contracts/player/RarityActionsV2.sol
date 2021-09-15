@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity 0.8.7;
 
+import {DelegateGuard} from "contracts/infrastructure/DelegateGuard.sol";
 import {IRarityAdventure, IRarityAttributes, RarityCommon} from "contracts/abstract/RarityCommon.sol";
 
 /// @title a DELEGATECALL target contract for bulk actions in Rarity
 /// @dev this does NOT implement the token receiver hooks. do NOT approve this contract!
-contract RarityActionsV2 is RarityCommon {
-
-    // todo: modifier to require delegatecall
+contract RarityActionsV2 is DelegateGuard, RarityCommon {
 
     function adventure(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             try RARITY.adventure(summoners[i]) {
                 // it worked       
             } catch (bytes memory /*lowLevelData*/) {
@@ -23,6 +23,7 @@ contract RarityActionsV2 is RarityCommon {
     function claimGold(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_GOLD.claim(summoners[i]);
         }
     }
@@ -30,13 +31,15 @@ contract RarityActionsV2 is RarityCommon {
     function approveGold(uint[] calldata summoners, uint spender) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_GOLD.approve(summoners[i], spender, 2 ** 256 - 1);
         }
     }
 
-    function craft(uint[] calldata summoners, uint spender) external {
+    function craft(uint[] calldata summoners, uint spender, uint moreargsneededhere) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             revert("under construction");
         }
     }
@@ -44,6 +47,7 @@ contract RarityActionsV2 is RarityCommon {
     function distantAdventure(uint[] calldata summoners, IRarityAdventure quest) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             if (quest.scout(summoners[i]) > 0) {
                 try quest.adventure(summoners[i]) {
                     // it worked       
@@ -57,6 +61,7 @@ contract RarityActionsV2 is RarityCommon {
     function increaseStrength(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_ATTRIBUTES.increase_strength(summoners[i]);
         }
     }
@@ -64,6 +69,7 @@ contract RarityActionsV2 is RarityCommon {
     function increaseDexterity(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_ATTRIBUTES.increase_dexterity(summoners[i]);
         }
     }
@@ -71,6 +77,7 @@ contract RarityActionsV2 is RarityCommon {
     function increaseConstitution(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_ATTRIBUTES.increase_constitution(summoners[i]);
         }
     }
@@ -78,6 +85,7 @@ contract RarityActionsV2 is RarityCommon {
     function increaseIntelligence(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_ATTRIBUTES.increase_intelligence(summoners[i]);
         }
     }
@@ -85,6 +93,7 @@ contract RarityActionsV2 is RarityCommon {
     function increaseWisdom(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_ATTRIBUTES.increase_wisdom(summoners[i]);
         }
     }
@@ -92,6 +101,7 @@ contract RarityActionsV2 is RarityCommon {
     function increaseCharisma(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_ATTRIBUTES.increase_charisma(summoners[i]);
         }
     }
@@ -100,6 +110,7 @@ contract RarityActionsV2 is RarityCommon {
     function levelUp(uint[] calldata summoners) external {        
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY.level_up(summoners[i]);
         }
     }
@@ -108,6 +119,7 @@ contract RarityActionsV2 is RarityCommon {
     function levelUpAndClaimGold(uint[] calldata summoners) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY.level_up(summoners[i]);
             RARITY_GOLD.claim(summoners[i]);
         }
@@ -116,11 +128,14 @@ contract RarityActionsV2 is RarityCommon {
     function setSkills(uint[] calldata summoners, uint8[36] memory skills) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
             RARITY_SKILLS.set_skills(summoners[i], skills);
         }
     }
 
     function summon(uint amount, uint class, IRarityAttributes.ability_score calldata ability_score) external {
+        requireDelegateCall();
+
         uint summoner;
         for (uint i = 0; i < amount; i++) {
             summoner = RARITY.next_summoner();
@@ -146,6 +161,8 @@ contract RarityActionsV2 is RarityCommon {
 
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
+            requireAuthSummoner(summoners[i]);
+
             balance = RARITY_GOLD.balanceOf(summoners[i]);
 
             RARITY_GOLD.transfer(summoners[i], to, balance);

@@ -1,5 +1,8 @@
 autofetch_sources: true
 
+networks:
+  default: mainnet
+
 compiler:
   solc:
     optimizer:

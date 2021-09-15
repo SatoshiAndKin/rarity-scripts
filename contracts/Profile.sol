@@ -1,0 +1,1 @@
+// a freely mintable NFT that points to an image on ipfs for use as a profile picture by RarityGuild
