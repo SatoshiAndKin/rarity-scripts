@@ -23,6 +23,13 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
     /// @dev don't forget this on the inheriting contracts!
     using EnumerableSet for EnumerableSet.UintSet;
 
+    struct InitData {
+        address actTarget;
+        ClassData[] classes;
+        string name;
+        address owner;
+    }
+
     struct ClassData {
         uint id;
         uint32[6] ability;
@@ -75,16 +82,10 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
     // Setup functions
     //
 
+    /// @notice setup contract implementation. Don't call this yourself; use "newNonPlayerCharacters"
     constructor(CloneFactory _cloneFactory) OwnedCloneable(_cloneFactory) {}
 
-    struct InitData {
-        address actTarget;
-        ClassData[] classes;
-        string name;
-        address owner;
-    }
-
-    /// @notice Initializer for use by the CloneFactory
+    /// @notice setup contract state. Don't call this yourself; use "newNonPlayerCharacters"
     function initialize(InitData calldata initData) external {
         // security checks
         requireDelegateCall();
@@ -188,17 +189,6 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
         }
     }
 
-    /// @notice give a summoner to this contract (no auth needed)
-    function giveSummoner(uint summoner) external {
-        // check that the summoner is free to adventure? or maybe its fine if we just skip over them
-        // check summoner skills/abilities/class match what we summon here
-        // we do this here instead of inside onERC721Received because that function is limited to 30k gas.
-
-        RARITY.safeTransferFrom(msg.sender, address(this), summoner);
-
-        revert("under construction");
-    }
-
     /// @notice summon a new summoner for this contract (no auth needed)
     function summon() external {
         _summon();
@@ -263,13 +253,21 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
     /// @dev receive known Rarity summoners spawned by this contract
     // TODO: have another contract that can receive any summoner? for now, the RarityGuild fills that role
     // TODO: or (since we check operator and not from) you can have a safe function that transferFroms valid summoers
-    function onERC721Received(address operator, address /*from*/, uint summoner, bytes calldata) external view returns(bytes4) {
+    /// @dev the standard limits this to 30k gas, but RARITY does not
+    function onERC721Received(address operator, address /*from*/, uint summoner, bytes calldata) external returns(bytes4) {
         require(RARITY.ownerOf(summoner) == address(this), "!rarity");
 
         // only allow summoners summoned by this contract. no external transfers allowed
         // to give a summoner to this contract, call "giveSummoner"
         require(operator == address(this), "!auth");
         require(npcs[npcs.length-1] == summoner, "!npc");
+
+        // i thought about approving for owner, but this seems better
+        // TODO: does this happen on transfer already?
+        RARITY.approve(address(0), summoner);
+
+        // TODO: check that the summoner is free to adventure? or maybe its fine if we just skip over them
+        // TODO: check summoner skills/abilities/class match what we summon here
 
         return this.onERC721Received.selector;
     }
