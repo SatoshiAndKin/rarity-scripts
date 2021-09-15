@@ -1,7 +1,7 @@
 autofetch_sources: true
 
 networks:
-  default: mainnet
+  default: ftm-main
 
 compiler:
   solc:
