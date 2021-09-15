@@ -42,16 +42,17 @@ class MinimumGasStrategy(BlockGasStrategy):
 
         super().__init__(block_duration)
 
+        self.block_time = block_time * block_duration
         self.extra = extra
 
     def __str__(self) -> str:
         gas_price = next(self.get_gas_price())
-        return f"MinimumGasStrategy recommends {gas_price/1e9:_} gwei (checking after {self.duration} blocks)"
+        return f"MinimumGasStrategy currently recommends {gas_price/1e9:_} gwei checking after ~{self.block_time:.0f} seconds ({self.duration} blocks)"
 
     def get_minimum_gas_price(self):
         # TODO: this is NOT the actual minimum! I don't know what is. it doesn't seem exposed
         # TODO: maybe just start real low and have brownie catch "transaction underpriced"
-        return web3.eth.price * 0.8
+        return web3.eth.gasPrice * 0.8
 
     def get_gas_price(self) -> Generator[Wei, None, None]:
         last_gas_price = self.get_minimum_gas_price()

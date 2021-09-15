@@ -1,4 +1,5 @@
 from rarity import cli
 
-def main():
-    cli.main()
+def main(*args):
+    # do all the heavy lifting in our python module with click
+    cli.main(*args)

@@ -1,48 +1,81 @@
 import logging
+import time
 
+import arrow
+import brownie
 import click
 import click_log
-from brownie import accounts, chain
-from brownie.network import gas_price
+
+from rarity.gas_strategy import MinimumGasStrategy
 
 logger = logging.getLogger("argobytes")
 
 
-def get_summoners():
-    raise NotImplementedError
+def main(*args):
+    """Run the click app."""
+    click_log.basic_config(logger)
+
+    rarity_cli.main(
+        args,
+        auto_envvar_prefix="RARITY",
+        prog_name="brownie run rarity main",
+        standalone_mode=False,
+    )
 
 
-@click.command()
-@click.option("--account", prompt=True)
+@click.group()
+@click.option("/account", prompt=True)
+@click.option("/gas-time", default=60)
+@click.option("/gas-extra", default="1 gwei")
 @click.pass_context
-def rarity_cli(ctx, account):
+def rarity_cli(ctx, account, gas_time, gas_extra):
     """Command line interface for Rarity."""
-    assert chain.id == 250, "not Fantom network!"
+    assert brownie.chain.id == 250, "not Fantom network!"
 
-    # TODO: open account
-    account = accounts.load(account)
+    print("\nConnected to", brownie.web3.provider.endpoint_uri)
 
-    gas_strat = NotImplemented
+    last_block = brownie.chain[-1]
+    print("Last block:", last_block.number, arrow.get(last_block.timestamp).humanize(), "\n")
 
-    print(gas_strat)
-    gas_price(gas_strat)
+    account = brownie.accounts.load(account)
+
+    print("\nHello,", account, "\n")
+
+    gas_strat = MinimumGasStrategy(gas_time, gas_extra)
+
+    print(gas_strat, "\n")
+    brownie.network.gas_price(gas_strat)
 
     ctx.ensure_object(dict)
 
-    ctx.update({
+    ctx.obj.update({
         "account": account,
         "gas_strat": gas_strat,
     })
 
 
+@rarity_cli.command()
+@click.pass_context
+def console(ctx):
+    from decimal import Decimal
+    from hexbytes import HexBytes
+    import eth_abi
+    import eth_utils
+    import IPython
 
-def main():
-    """Run the click app."""
-    click_log.basic_config(logger)
+    extra_locals = {
+        # "ApeSafe": ApeSafe,
+        "account": ctx.obj["account"],
+        "brownie": brownie,
+        "chain": brownie.chain,
+        "Contract": brownie.Contract,
+        "Decimal": Decimal,
+        "eth_abi": eth_abi,
+        "eth_utils": eth_utils,
+        "gas_strat": ctx.obj["gas_strat"],
+        "HexBytes": HexBytes,
+        "tx_history": brownie.network.history,
+        "web3": brownie.web3,
+    }
 
-    rarity_cli.main(
-        # TODO: build args
-        [],
-        auto_envvar_prefix="RARITY",
-        standalone_mode=False,
-    )
+    IPython.start_ipython(argv=[], user_ns=extra_locals)
