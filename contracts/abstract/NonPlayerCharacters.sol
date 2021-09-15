@@ -138,7 +138,7 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
             // summon more npcs
             uint npcsNeeded = nextNPCIndex + actingNpcs - currentNPCs;
             for (uint i = 0; i < npcsNeeded; i++) {
-                _summon();
+                summon();
             }
         }
 
@@ -189,38 +189,78 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
         }
     }
 
+    /// @notice Send a summoner to this contract.
+    function giveSummoner(address from, address to, uint summoner, uint _npcClassIndex) external {    
+        bool npcClassFound = false;
+
+        uint classesLength = classes.length;
+        for (uint i = 0; i < classesLength; i++) {
+            if (i == _npcClassIndex) {
+                ClassData memory npcClass = classes[_npcClassIndex];
+
+                uint classId = RARITY.class(summoner);
+                require(classId == npcClass.id, "!class");
+
+                RARITY.transferFrom(from, to, summoner);
+
+                // this will revert if the summoner doesn't fit the npcClass
+                _summon_setup(summoner, npcClass);
+
+                npcClassFound = true;
+            } else if (msg.sender != owner()) {
+                // if there are multiple class types on this contract, someone could spam us with just 1 of them
+                // so we spawn the ones they aren't adding
+                // TODO: think about this more
+
+                _summon(i);
+            }
+        }
+
+        require(npcClassFound, "!npcClass");
+    }
+
     /// @notice summon a new summoner for this contract (no auth needed)
-    function summon() external {
-        _summon();
+    function summon() public {
+        // rotate through the classes
+        uint nextNpcClass = npcs.length % classes.length;
+
+        _summon(nextNpcClass);
     }
 
     /// @dev summon a summoner for this group of NPCs
-    function _summon() internal {
-        // rotate through the classes
-        ClassData memory class = classes[npcs.length % classes.length];
-
+    function _summon(uint _npcClass) internal {
         uint summoner = RARITY.next_summoner();
-        
-        // register the summoner as an NPC **before** summoning
-        npcs.push(summoner);
 
-        RARITY.summon(class.id);
+        ClassData memory classData = classes[_npcClass];
 
-        _setup_summon(class.id, summoner);
+        RARITY.summon(classData.id);
+
+        _summon_setup(summoner, classData);
+    }
+
+    /// @dev called by _summon and giveSummmoner to set skills and ability scores
+    function _summon_setup(uint summoner, ClassData memory classData) internal {
+        // TODO: check ability scores and spend points (revert if not possible)
+
+        // TODO: check skills and spend skill points (revert if not possible)
+
+        // contracts that extend NonPlayerCharacters can do whatever they want next. this will probably use the summoner's level
+        _summon_setup_more(summoner, classData);
     }
 
     /// @dev override this to call more during "_summon"
-    function _setup_summon(uint class, uint summoner) internal virtual;
+    /// @dev this must be written in a way that allows for existing summoners to be configured
+    function _summon_setup_more(uint summoner, ClassData memory classData) internal virtual;
 
-    /// @notice take a summoner from this contract
-    function transferSummoner(uint summoner, address to) external {
+    /// @notice send a summoner from this contract to another address.
+    function transferSummoner(address to) external {
         requireOwnerSender();
 
-        _transferSummoner(summoner, to);
+        _transferSummoner(to, firstNPCIndex);
     }
 
     /// @dev send the first NPC out of this contract
-    function _transferSummoner(uint summoner, address to) internal {
+    function _transferSummoner(address to, uint summoner) internal {
         RARITY.safeTransferFrom(address(this), msg.sender, summoner);
 
         npcs[firstNPCIndex] = 0;
@@ -232,7 +272,7 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
     // Recovery functions
     //
 
-    /// @dev fix nextNPCIndex (hopefully never needed)
+    /// @notice fix nextNPCIndex (hopefully never needed)
     function setNextNPC(uint _index) external {
         requireOwnerSender();
 
@@ -260,14 +300,8 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
         // only allow summoners summoned by this contract. no external transfers allowed
         // to give a summoner to this contract, call "giveSummoner"
         require(operator == address(this), "!auth");
-        require(npcs[npcs.length-1] == summoner, "!npc");
 
-        // i thought about approving for owner, but this seems better
-        // TODO: does this happen on transfer already?
-        RARITY.approve(address(0), summoner);
-
-        // TODO: check that the summoner is free to adventure? or maybe its fine if we just skip over them
-        // TODO: check summoner skills/abilities/class match what we summon here
+        npcs.push(summoner);
 
         return this.onERC721Received.selector;
     }
