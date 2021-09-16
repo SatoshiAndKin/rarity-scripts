@@ -1,5 +1,11 @@
 # Brownie scripts for Rarity
 
+<https://rarity.game/>
+
+<https://github.com/andrecronje/rarity/tree/main/core>
+
+<https://andrecronje.medium.com/rarity-composable-nft-architecture-5a76cbc85d58>
+
 ## Installation
 
 Run the following in your terminal:

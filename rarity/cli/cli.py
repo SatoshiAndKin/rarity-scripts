@@ -1,15 +1,11 @@
-import logging
-import time
-
 import arrow
 import brownie
 import click
 import click_log
-import lazy_load
 
 from rarity.gas_strategy import MinimumGasStrategy
 
-logger = logging.getLogger("argobytes")
+from .cli_helpers import logger, common_helpers
 
 
 def main(*args):
@@ -27,13 +23,15 @@ def main(*args):
 
         with ctx:
             rarity_cli.invoke(ctx)
-    except Exception as e:
+    except click.exceptions.Exit as e:
         # we are inside `brownie run` and we don't want it to exit with an ugly error
+        # TODO: catch abort, too?
         if e.exit_code != 0:
             raise
 
 
 @click.group()
+@click_log.simple_verbosity_option(logger)
 @click.option("/account", prompt=True)
 @click.option("/password", prompt=True, hide_input=True)
 @click.option("/gas-time", default=60)
@@ -69,24 +67,23 @@ def rarity_cli(ctx, account, gas_time, gas_extra, password):
 @rarity_cli.command()
 @click.pass_context
 def console(ctx):
-    from decimal import Decimal
-    from hexbytes import HexBytes
-    import eth_abi
-    import eth_utils
+    """Open an interactive console."""
     import IPython
 
-    extra_locals = {
-        "account": ctx.obj["account"],
-        "brownie": brownie,
-        "chain": brownie.chain,
-        "Contract": brownie.Contract,
-        "Decimal": Decimal,
-        "eth_abi": eth_abi,
-        "eth_utils": eth_utils,
-        "gas_strat": ctx.obj["gas_strat"],
-        "HexBytes": HexBytes,
-        "tx_history": brownie.network.history,
-        "web3": brownie.web3,
-    }
+    IPython.start_ipython(argv=[], user_ns=common_helpers(ctx))
 
-    IPython.start_ipython(argv=[], user_ns=extra_locals)
+
+@rarity_cli.command()
+@click.argument("python_code", type=str)
+@click.pass_context
+def run(ctx, python_code):
+    """Exec arbitrary (and hopefully audited!) python code. Be careful with this!"""
+    eval(python_code, {}, common_helpers(ctx))
+
+
+@rarity_cli.command()
+@click.argument("python_file", type=click.File(mode="r"))
+@click.pass_context
+def run_file(ctx, python_file):
+    """Exec arbitrary (and hopefully audited!) python files. Be careful with this!"""
+    eval(python_file.read(), {}, common_helpers(ctx))
