@@ -7,7 +7,7 @@ import {IRarityAttributes} from "contracts/external/rarity/IRarityAttributes.sol
 import {IRarityGold} from "contracts/external/rarity/IRarityGold.sol";
 import {IRaritySkills} from "contracts/external/rarity/IRaritySkills.sol";
 
-error NotApprovedOrOwner(address who, uint summoner);
+import "contracts/infrastructure/Errors.sol";
 
 abstract contract RarityCommon {
 

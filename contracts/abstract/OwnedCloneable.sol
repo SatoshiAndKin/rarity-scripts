@@ -9,8 +9,9 @@
  */
 pragma solidity 0.8.7;
 
-import "contracts/Errors.sol";
 import {Cloneable, CloneFactory} from "./Cloneable.sol";
+
+import "contracts/infrastructure/Errors.sol";
 
 abstract contract OwnedCloneable is Cloneable {
 

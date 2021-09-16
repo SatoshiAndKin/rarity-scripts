@@ -17,7 +17,7 @@ import "@OpenZeppelin/token/ERC721/IERC721.sol";
 import {CloneFactory, OwnedCloneable} from "contracts/abstract/OwnedCloneable.sol";
 import {RarityCommon} from "contracts/abstract/RarityCommon.sol";
 
-import "contracts/Errors.sol";
+import "contracts/infrastructure/Errors.sol";
 
 abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
     /// @dev don't forget this on the inheriting contracts!

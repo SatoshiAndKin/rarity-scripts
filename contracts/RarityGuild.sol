@@ -9,14 +9,15 @@
  */
 pragma solidity 0.8.7;
 
-import "./Errors.sol";
-
 import "@OpenZeppelin/utils/structs/EnumerableSet.sol";
 import "@OpenZeppelin/token/ERC721/IERC721.sol";
 
 import {RarityCommon} from "contracts/abstract/RarityCommon.sol";
 import {CloneFactory} from "contracts/infrastructure/CloneFactory.sol";
 import {OwnedCloneable} from "contracts/abstract/OwnedCloneable.sol";
+
+import "contracts/infrastructure/Errors.sol";
+
 
 /// @title A NFT-owning contract for playing blockchain games
 /// @author Bryan Stitt <bryan@satoshiandkin.com>
