@@ -9,3 +9,7 @@ def guild():
 def found():
     raise NotImplementedError
 
+
+@guild.command()
+def summon():
+    raise NotImplementedError

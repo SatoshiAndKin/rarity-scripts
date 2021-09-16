@@ -1,8 +1,2 @@
-import dotenv
-import os
-
-
-def main():
-    #
-
+def summon():
     raise NotImplementedError

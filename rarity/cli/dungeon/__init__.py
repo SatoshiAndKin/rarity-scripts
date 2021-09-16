@@ -1,10 +1,10 @@
 from rarity.cli import rarity_cli
 
 @rarity_cli.group()
-def npc():
-    """Manage Non-player characters."""
+def dungeon():
+    """Manage a dungeon."""
 
 
-@npc.command()
-def summon():
+@dungeon.command()
+def create():
     raise NotImplementedError
