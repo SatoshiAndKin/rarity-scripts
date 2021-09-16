@@ -1,5 +1,5 @@
-from .cli import cli
+from rarity.cli import rarity_cli
 
-__ALL__ = [
-    cli,
-]
+@rarity_cli.group()
+def player():
+    """Manage player characters."""

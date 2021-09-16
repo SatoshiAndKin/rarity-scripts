@@ -21,6 +21,8 @@ Run the following in your terminal:
 
     ./venv/bin/brownie run rarity main /help
 
+NOTE: brownie flags start with "--". rarity command flags start with "/"
+
 ## Todo
 
 Makefile or fabfile or something for doing setup

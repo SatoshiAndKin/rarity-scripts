@@ -5,7 +5,7 @@ import click_log
 
 from rarity.gas_strategy import MinimumGasStrategy
 
-from .cli_helpers import logger, common_helpers
+from .cli_helpers import logger, common_helpers, lazy_account
 
 
 def main(*args):
@@ -32,19 +32,20 @@ def main(*args):
 
 @click.group()
 @click_log.simple_verbosity_option(logger)
-@click.option("/account", prompt=True)
-@click.option("/password", prompt=True, hide_input=True)
-@click.option("/gas-time", default=60)
-@click.option("/gas-extra", default="1 gwei")
+@click.option("/account", prompt=True, help="The brownie account to load")
+# TODO: click type for secure readable file
+@click.option("/passfile", help="Path to the ")
+# TODO: option to load password from a file
+@click.option("/gas-time", default=60, help="how often to check if gas price needs to be increased")
+@click.option("/gas-extra", default="1 gwei", help="how much more than the minimum gas price to pay")
 @click.pass_context
 def rarity_cli(ctx, account, gas_time, gas_extra, password):
     """Command line interface for Rarity."""
     assert brownie.chain.id == 250, "not Fantom network!"
 
     # TODO: wait to load this
-    brownie_account = brownie.accounts.load(account, password=password)
-
-    print(f"Hello, {brownie_account}!\n")
+    print(f"Loading account {account}...")
+    account = lazy_account(account, password)
 
     print("\nConnected to", brownie.web3.provider.endpoint_uri)
 
