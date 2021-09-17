@@ -78,13 +78,13 @@ At the end, you will be given an address. Save this address! Replace "$GUILD_ADD
 
 ### Create a summoner for your Guild
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" summon
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild summon "$GUILD_ADDR"
 
 Follow the prompts to build a summoner.
 
 ### Invite Someone to your Guild
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" invite
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild invite "$GUILD_ADDR"
 
 Be **VERY** careful with who you invite! Any member can take everything from the guild!
 
@@ -100,19 +100,19 @@ Towns that are open for any player to interact with are planned.
 
 ### Enroll your summoner in your Guild
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" enroll_summoner "$SUMMONER_ID"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild enroll_summoner "$GUILD_ADDR" "$SUMMONER_ID"
 
 Allow your guildmates to control your summoner.
 
 ### Transfer your summoner to your guild
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" summon
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild summon "$GUILD_ADDR"
 
 Follow the prompts to give your guild a summoner.
 
 ### Remove a summoner from your Guild
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" remove_summoner "$SUMMONER_ID" "$DESTINATION_ADDR"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild remove_summoner "$GUILD_ADDR" "$SUMMONER_ID" "$DESTINATION_ADDR"
 
 Please don't steal from your guildmates!
 
@@ -120,13 +120,13 @@ DESTINATION_ADDR can be your account or any other account. If not specified, it 
 
 ### Adventure with your Guild
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" adventure
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild adventure "$GUILD_ADDR"
 
 Depending on the size of your guild, you may need to call this multiple times per day.
 
 ### Send your Guild's NPCs to work
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" work_npcs
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild work_npcs "$GUILD_ADDR"
 
 This function can be called as many times per day as you are willing to pay for.
 
@@ -136,12 +136,20 @@ This function can be called as many times per day as you are willing to pay for.
 
 Create an interactive dungeon for summoners to adventure inside.
 
-At the end, you will be given an address. Replace ""$GUILD_ADDR"" in the later example commands with this address.
+At the end, you will be given an address. Replace "$DUNGEON_ADDR" in the later example commands with this address.
 
 ### Adventure in the Dungeon
 
-    ./scripts/rarity.sh /account "$ACCOUNT" dungeon DUNGEON_ADDR enter "$SUMMONER_ID"
+First, enter the dungeon:
 
-### Advanced: Open a bash shell in the docker container
+    ./scripts/rarity.sh /account "$ACCOUNT" dungeon adventure "$DUNGEON_ADDR" "$SUMMONER_ID"
+
+Then, repeat these until your summoner has returned:
+
+    ./scripts/rarity.sh /account "$ACCOUNT" dungeon choose "$DUNGEON_ADDR" "$SUMMONER_ID"
+
+### Advanced: Open a bash shell
+
+If you want to explore the docker container, open a shell:
 
     ~/bin/play-rarity.sh bash
