@@ -24,42 +24,119 @@ Run the following in your terminal:
 
     ~/bin/play-rarity.sh /help
 
-NOTE: brownie's flags start with "--". rarity's flags start with "/"
+You can add "/help" to the end of any command to see more information.
+
+NOTE: Brownie's flags (like "--help") start with "--". Rarity's flags start with "/". This is so the scripts can easily tell flags apart.
 
 ### Setup your account
 
     ~/bin/play-rarity.sh accounts from_mnemonic
 
+Follow the prompts to setup your account. The account's key will be encrypted with a passphrase of your choosing.
+
+Replace "$ACCOUNT" in any other command with the account name that you chose.
+
+### Get some FTM
+
+In order to send any transactions, your account will need some [FTM](https://fantom.foundation/) on the Fantom chain.
+
+Exchanges:
+
+- <https://paraswap.io/#/?network=ethereum>
+- <https://app.sushi.com/swap>
+- <https://spookyswap.finance/>
+
+Bridges:
+
+- <https://multichain.xyz/>
+- <https://docs.spookyswap.finance/links/bridge-to-fantom-opera>
+
 ### Create a summoner
 
-    ~/bin/play-rarity.sh /account YOUR_ACCOUNT player summon
+    ~/bin/play-rarity.sh /account "$ACCOUNT" player summon
+
+Follow the prompts to build a summoner.
 
 ### Interactive console
 
-    ~/bin/play-rarity.sh /account YOUR_ACCOUNT console
+    ~/bin/play-rarity.sh /account "$ACCOUNT" console
 
-This opens an [Ipython](https://ipython.org/) console.
+This opens an [Ipython](https://ipython.org/) console with a bunch of helpful things already imported. Run `dir()` to see them all.
 
-### Create or Join a Guild
+### Create a Guild
 
-    ~/bin/play-rarity.sh /account YOUR_ACCOUNT guild /help
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild create
+
+Follow the prompts to create a guild.
+
+At the end, you will be given an address. Save this address! Replace "$GUILD_ADDR" in any later command with this address.
+
+### Create a summoner for your Guild
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" summon
+
+Follow the prompts to build a summoner.
+
+### Invite Someone to your Guild
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" invite
+
+Be **VERY** careful with who you invite! Any member can take everything from the guild!
+
+More advanced security is planned.
 
 ### Create an NPC Town for your Guild
 
-...
+    ~/bin/play-rarity.sh /account "$ACCOUNT" npc create_town "$GUILD_ADDR"
+
+Follow the prompts to create a town full of multiple NPCs. Only the guild can interact with the town.
+
+Towns that are open for any player to interact with are planned.
 
 ### Enroll your summoner in your Guild
 
-...
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" enroll_summoner "$SUMMONER_ID"
+
+Allow your guildmates to control your summoner.
+
+### Transfer your summoner to your guild
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" summon
+
+Follow the prompts to give your guild a summoner.
+
+### Remove a summoner from your Guild
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" remove_summoner "$SUMMONER_ID" "$DESTINATION_ADDR"
+
+Please don't steal from your guildmates!
+
+DESTINATION_ADDR can be your account or any other account. If not specified, it will default to your account. Be careful with this! Summoners could be lost!
 
 ### Adventure with your Guild
 
-...
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" adventure
+
+Depending on the size of your guild, you may need to call this multiple times per day.
+
+### Send your Guild's NPCs to work
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild "$GUILD_ADDR" work_npcs
+
+This function can be called as many times per day as you are willing to pay for.
 
 ### Create a Dungeon
 
-    ./scripts/rarity.sh /account YOUR_ACCOUNT dungeon /help
+    ./scripts/rarity.sh /account "$ACCOUNT" dungeon /help
 
-### Enter the Dungeon
+Create an interactive dungeon for summoners to adventure inside.
 
-...
+At the end, you will be given an address. Replace ""$GUILD_ADDR"" in the later example commands with this address.
+
+### Adventure in the Dungeon
+
+    ./scripts/rarity.sh /account "$ACCOUNT" dungeon DUNGEON_ADDR enter "$SUMMONER_ID"
+
+### Advanced: Open a bash shell in the docker container
+
+    ~/bin/play-rarity.sh bash
