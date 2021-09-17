@@ -14,32 +14,32 @@ Run the following in your terminal:
 
     docker pull bwstitt/rarity
 
-    docker run --entrypoint "" -v "$HOME/bin/:/host/" bwstitt/rarity cp ./scripts/docker-rarity.sh /host/
+    docker run --entrypoint "" -v "$HOME/bin/:/host/" bwstitt/rarity cp ./scripts/docker-rarity.sh /host/play-rarity.sh
 
 
 ## Usage
 
 Run the following in your terminal:
 
-    ~/bin/docker-rarity.sh /help
+    ~/bin/play-rarity.sh /help
 
-NOTE: brownie flags start with "--". rarity command flags start with "/"
+NOTE: brownie's flags start with "--". rarity's flags start with "/"
 
 ### Setup your account
 
-    ~/bin/docker-rarity.sh accounts from_mnemonic
+    ~/bin/play-rarity.sh accounts from_mnemonic
 
 ### Create your first summoner
 
-    ~/bin/docker-rarity.sh /account YOUR_ACCOUNT player summon
+    ~/bin/play-rarity.sh /account YOUR_ACCOUNT player summon
 
 ### Interactive console
 
-    ~/bin/docker-rarity.sh /account YOUR_ACCOUNT console
+    ~/bin/play-rarity.sh /account YOUR_ACCOUNT console
 
 ### Create or Join a Guild
 
-    ~/bin/docker-rarity.sh /account YOUR_ACCOUNT guild /help
+    ~/bin/play-rarity.sh /account YOUR_ACCOUNT guild /help
 
 ### Create an NPC Town for your Guild
 

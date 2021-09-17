@@ -1,4 +1,5 @@
 #!/bin/sh -eux
+# Development helper function to lint all the smart contracts and python code
 
 solhint  --fix contracts/**.sol
 
