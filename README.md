@@ -140,13 +140,17 @@ At the end, you will be given an address. Replace "$DUNGEON_ADDR" in the later e
 
 ### Adventure in the Dungeon
 
-First, enter the dungeon:
+First, scout the dungeon:
 
-    ./scripts/rarity.sh /account "$ACCOUNT" dungeon adventure "$DUNGEON_ADDR" "$SUMMONER_ID"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" dungeon scout "$DUNGEON_ADDR" "$SUMMONER_ID"
+
+If you think you will survive, enter the dungeon:
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" dungeon adventure "$DUNGEON_ADDR" "$SUMMONER_ID"
 
 Then, repeat these until your summoner has returned:
 
-    ./scripts/rarity.sh /account "$ACCOUNT" dungeon choose "$DUNGEON_ADDR" "$SUMMONER_ID"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" dungeon choose "$DUNGEON_ADDR" "$SUMMONER_ID"
 
 ### Advanced: Open a bash shell
 
