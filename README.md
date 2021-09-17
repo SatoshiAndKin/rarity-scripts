@@ -16,7 +16,7 @@ Copy and paste the following into your terminal:
 
     docker run --pull always -v "$HOME/bin/:/host/" bwstitt/rarity:latest bash -c "cp /rarity-scripts/scripts/play-rarity.sh /host/ && echo Successfully installed to \~/bin/play-rarity.sh"
 
-To upgrade, run this command again.
+To upgrade, run the above command again.
 
 ## Usage
 
