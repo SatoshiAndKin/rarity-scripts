@@ -6,7 +6,7 @@ case "$1" in
         set -- "$@"
     ;;
     *)
-        set -- /rarity-brownie/scripts/rarity.sh "$@"
+        set -- /rarity-scripts/scripts/rarity.sh "$@"
     ;;
 esac
 

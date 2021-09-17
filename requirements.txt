@@ -9,7 +9,7 @@ aiohttp==3.7.4.post0
     #   eth-brownie
     #   web3
 arrow==1.1.1
-    # via rarity-brownie (setup.cfg)
+    # via rarity-scripts (setup.cfg)
 asttokens==2.0.4
     # via
     #   eth-brownie
@@ -52,9 +52,9 @@ click==8.0.1
     #   black
     #   click-log
     #   eth-brownie
-    #   rarity-brownie (setup.cfg)
+    #   rarity-scripts (setup.cfg)
 click-log==0.3.2
-    # via rarity-brownie (setup.cfg)
+    # via rarity-scripts (setup.cfg)
 cytoolz==0.11.0
     # via
     #   eth-brownie
@@ -78,7 +78,7 @@ eth-account==0.5.5
     #   eth-brownie
     #   web3
 git+https://github.com/SatoshiAndKin/brownie@ebb2cb95a897fb42a8c8133ffb613f1fb8ccb50c#egg=eth-brownie
-    # via rarity-brownie (setup.cfg)
+    # via rarity-scripts (setup.cfg)
 eth-event==1.2.3
     # via eth-brownie
 eth-hash[pycryptodome]==0.3.2
@@ -158,7 +158,7 @@ jsonschema==3.2.0
     #   mythx-models
     #   web3
 lazy-load==0.8.2
-    # via rarity-brownie (setup.cfg)
+    # via rarity-scripts (setup.cfg)
 lazy-object-proxy==1.6.0
     # via
     #   eth-brownie

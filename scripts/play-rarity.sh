@@ -23,7 +23,7 @@ if [ "$RARITY_TAG" == "latest" ] && [ "$DOCKER_PULL" == "1" ]; then
     fi
 fi
 
-build_dir="$RARITY_HOME/build/rarity-brownie"
+build_dir="$RARITY_HOME/build/rarity-scripts"
 if [ ! -d "$build_dir" ]; then
     mkdir -p "$build_dir"
 fi
