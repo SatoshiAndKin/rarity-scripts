@@ -40,6 +40,11 @@ Replace "$ACCOUNT" in any other command with the account name that you chose.
 
 In order to send any transactions, your account will need some [FTM](https://fantom.foundation/) on the Fantom chain.
 
+Depending on your situation and current prices, one of these choices will probably be best:
+
+1) Trade your tokens for FTM on Ethereum. Then bridge your FTM to Fantom.
+2) Bridge your tokens to Fantom. Then trade your tokens for FTM on Fantom.
+
 Exchanges:
 
 - <https://paraswap.io/#/?network=ethereum>
