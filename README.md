@@ -10,12 +10,11 @@
 
 Install [Docker for Desktop](https://www.docker.com/products/docker-desktop).
 
-Run the following in your terminal:
+Copy and paste the following into your terminal:
 
-    docker pull bwstitt/rarity
+    docker run --pull always -v "$HOME/bin/:/host/" bwstitt/rarity:latest bash -c "cp /rarity-brownie/scripts/play-rarity.sh /host/ && echo Successfully installed to \~/bin/play-rarity.sh"
 
-    docker run --entrypoint "" -v "$HOME/bin/:/host/" bwstitt/rarity cp ./scripts/docker-rarity.sh /host/play-rarity.sh
-
+To upgrade, run this command again.
 
 ## Usage
 
@@ -29,13 +28,15 @@ NOTE: brownie's flags start with "--". rarity's flags start with "/"
 
     ~/bin/play-rarity.sh accounts from_mnemonic
 
-### Create your first summoner
+### Create a summoner
 
     ~/bin/play-rarity.sh /account YOUR_ACCOUNT player summon
 
 ### Interactive console
 
     ~/bin/play-rarity.sh /account YOUR_ACCOUNT console
+
+This opens an [Ipython](https://ipython.org/) console.
 
 ### Create or Join a Guild
 

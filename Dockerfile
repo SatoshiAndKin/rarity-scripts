@@ -1,5 +1,9 @@
 FROM python:3.9
 
+# setup entrypoint that we will copy later
+WORKDIR /root
+ENTRYPOINT ["/rarity-brownie/docker/entrypoint.sh"]
+
 COPY docker/apt-install.sh /usr/sbin/
 
 RUN apt-install.sh \
@@ -10,7 +14,7 @@ RUN apt-install.sh \
 ;
 
 # setup python virtualenv
-ENV PATH /venv/bin:$PATH
+ENV PATH /venv/bin:/rarity-brownie/scripts:$PATH
 RUN --mount=type=cache,target=/root/.cache { set -eux; \
     \
     python3.9 -m venv /venv; \
@@ -24,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cache { set -eux; \
     npm install -g hardhat ganache-cli; \
 }
 
-# intstall the python dependencies
+# install the python dependencies
 COPY requirements.txt /rarity-brownie/
 RUN --mount=type=cache,target=/root/.cache { set -eux; \
     pip install \
@@ -42,7 +46,9 @@ RUN --mount=type=cache,target=/root/.cache { set -eux; \
         --disable-pip-version-check \
         -r /rarity-brownie/requirements.txt -e /rarity-brownie/ \
     ; \
+    build_dir=/rarity-brownie/build; \
+    persist_dir=/root/build/rarity-brownie; \
+    rm -rf "$build_dir"; \
+    mkdir -p "$persist_dir"; \
+    ln -sfv "$persist_dir" "$build_dir"; \
 }
-
-WORKDIR /rarity-brownie/
-ENTRYPOINT ["./docker/entrypoint.sh"]
