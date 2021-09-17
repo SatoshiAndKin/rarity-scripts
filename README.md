@@ -42,7 +42,7 @@ In order to send any transactions, your account will need some [FTM](https://fan
 
 Depending on your situation and current prices, one of these choices will probably be best:
 
-1) Trade your tokens for FTM on Ethereum. Then bridge your FTM to Fantom.
+1) Trade your tokens for FTM on any chain. Then bridge your FTM to Fantom.
 2) Bridge your tokens to Fantom. Then trade your tokens for FTM on Fantom.
 
 Exchanges:
