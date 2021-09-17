@@ -3,7 +3,7 @@
 set -eu
 
 DOCKER_PULL=${DOCKER_PULL:-1}
-RARITY_HOME=${RARITY_HOME:-$HOME/.rarity-docker}
+RARITY_HOME=${RARITY_HOME:-$HOME/.rarity-scripts}
 RARITY_TAG=${RARITY_TAG:-latest}
 
 # pull if we haven't pulled in the last 24 hours

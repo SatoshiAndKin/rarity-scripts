@@ -1,10 +1,12 @@
-# Brownie scripts for Rarity
+# Scripts for Playing Rarity
+
+<https://andrecronje.medium.com/rarity-composable-nft-architecture-5a76cbc85d58>
 
 <https://rarity.game/>
 
 <https://github.com/andrecronje/rarity/tree/main/core>
 
-<https://andrecronje.medium.com/rarity-composable-nft-architecture-5a76cbc85d58>
+<https://eth-brownie.readthedocs.io/>
 
 ## Installation
 
