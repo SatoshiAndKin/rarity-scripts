@@ -2,6 +2,7 @@ import click
 from collections import namedtuple
 from enum import IntEnum
 
+import brownie
 from brownie import Contract, multicall, web3
 from lazy_load import lazy_func
 from eth_utils import keccak, to_bytes, to_checksum_address
@@ -64,8 +65,12 @@ def get_or_create(
     return contract.at(contract_address, account)
 
 
-lazy_contract = lazy_func(Contract)
+def get_or_create_from_project(contract_name, constructor_args=None, salt=None):
+    contract = getattr(brownie, contract_name)
 
+
+lazy_contract = lazy_func(Contract)
+lazy_get_or_create_from_project = lazy_func(get_or_create_from_project)
 
 RARITY = lazy_contract("0xce761d788df608bd21bdd59d6f4b54b2e27f25bb")
 RARITY_ATTRIBUTES = lazy_contract("0xB5F5AF1087A8DA62A23b08C00C6ec9af21F397a1")
@@ -82,8 +87,9 @@ RARITY_CODEX_ITEMS_GOODS = lazy_contract("0x0C5C1CC0A7AE65FE372fbb08FF16578De4b9
 RARITY_CODEX_ITEMS_ARMOR = lazy_contract("0xf5114A952Aca3e9055a52a87938efefc8BB7878C")
 RARITY_CODEX_ITEMS_WEAPONS = lazy_contract("0xeE1a2EA55945223404d73C0BbE57f540BBAAD0D8")
 
+RARITY_ACTION_V2 = get_or_create_from_project("RarityActionsV2")
+RARITY_GUILD = get_or_create_from_project("RarityGuild")
 
-RARITY_ACTION_V2 = lazy_contract(lambda: get_or_create(None, ArgobytesBrownieProject.RarityActionV2))
 
 Summoner = namedtuple("Summoner", ["summoner", "xp", "log", "classId", "level"])
 

@@ -8,18 +8,20 @@
 
 ## Installation
 
+Install [Docker for Desktop](https://www.docker.com/products/docker-desktop).
+
 Run the following in your terminal:
 
-    python3 -m venv
-    sourve venv/bin/activate
-    pip install -U pip setuptools wheel
-    pip install -r requirements.in -e .
+    docker pull bwstitt/rarity
+
+    docker run --entrypoint "" -v "$HOME/bin/:/host/" bwstitt/rarity cp ./scripts/docker-rarity.sh /host/
+
 
 ## Usage
 
 Run the following in your terminal:
 
-    ./scripts/rarity.sh /help
+    ~/bin/docker-rarity.sh /help
 
 NOTE: brownie flags start with "--". rarity command flags start with "/"
 

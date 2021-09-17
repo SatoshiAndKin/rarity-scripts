@@ -19,7 +19,7 @@ import {RarityCommon} from "contracts/abstract/RarityCommon.sol";
 
 import "contracts/infrastructure/Errors.sol";
 
-abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
+contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
     /// @dev don't forget this on the inheriting contracts!
     using EnumerableSet for EnumerableSet.UintSet;
 
@@ -250,7 +250,7 @@ abstract contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
 
     /// @dev override this to call more during "_summon"
     /// @dev this must be written in a way that allows for existing summoners to be configured
-    function _summon_setup_more(uint summoner, ClassData memory classData) internal virtual;
+    function _summon_setup_more(uint summoner, ClassData memory classData) internal virtual {}
 
     /// @notice send a summoner from this contract to another address.
     function transferSummoner(address to) external {

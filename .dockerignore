@@ -1,7 +1,6 @@
 __pycache__
 .history
 .hypothesis/
-*.egg-info/
 build/
 reports/
 venv/
