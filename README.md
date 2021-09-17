@@ -27,19 +27,19 @@ NOTE: brownie flags start with "--". rarity command flags start with "/"
 
 ### Setup your account
 
-    ./scripts/rarity.sh accounts from_mnemonic
+    ~/bin/docker-rarity.sh accounts from_mnemonic
 
 ### Create your first summoner
 
-    ./scripts/rarity.sh /account YOUR_ACCOUNT player summon
+    ~/bin/docker-rarity.sh /account YOUR_ACCOUNT player summon
 
 ### Interactive console
 
-    ./scripts/rarity.sh /account YOUR_ACCOUNT console
+    ~/bin/docker-rarity.sh /account YOUR_ACCOUNT console
 
 ### Create or Join a Guild
 
-    ./scripts/rarity.sh /account YOUR_ACCOUNT guild /help
+    ~/bin/docker-rarity.sh /account YOUR_ACCOUNT guild /help
 
 ### Create an NPC Town for your Guild
 
