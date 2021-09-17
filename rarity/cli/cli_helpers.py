@@ -1,3 +1,4 @@
+import click
 import logging
 
 import brownie
@@ -46,6 +47,9 @@ def common_helpers(click_ctx):
 
 
 def _lazy_account(account_name, password_name):
+    if not account_name:
+        account_name = click.prompt("Account")
+
     print(f"Loading account {account_name}...")
 
     # TODO: prompt password here

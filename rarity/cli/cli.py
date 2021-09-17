@@ -32,7 +32,7 @@ def main(*args):
 
 @click.group()
 @click_log.simple_verbosity_option(logger)
-@click.option("/account", prompt=True, help="The brownie account to load")
+@click.option("/account", help="The brownie account to load")
 # TODO: click type for secure readable file
 @click.option("/passfile", help="DANGER! File that contains the account password. DANGER!")
 # TODO: option to load password from a file
@@ -77,8 +77,10 @@ def console(ctx):
 @click.argument("python_code", type=str)
 @click.pass_context
 def run(ctx, python_code):
-    """Exec arbitrary (and hopefully audited!) python code. Be careful with this!"""
-    eval(python_code, {}, common_helpers(ctx))
+    """Exec arbitrary (and hopefully audited!) python code. Be careful with this!
+    
+    """
+    print(eval(python_code, {}, common_helpers(ctx)))
 
 
 @rarity_cli.command()
@@ -86,4 +88,4 @@ def run(ctx, python_code):
 @click.pass_context
 def run_file(ctx, python_file):
     """Exec arbitrary (and hopefully audited!) python files. Be careful with this!"""
-    eval(python_file.read(), {}, common_helpers(ctx))
+    print(eval(python_file.read(), {}, common_helpers(ctx)))
