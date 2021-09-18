@@ -14,4 +14,6 @@ def summon(ctx):
     """Summon a new player character."""
     from .summon import summon
 
+    ctx.obj["setup_gas_strat"]()
+
     summon(ctx)

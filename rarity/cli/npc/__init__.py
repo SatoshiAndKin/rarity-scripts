@@ -1,3 +1,5 @@
+import click
+
 from rarity.cli import rarity_cli
 
 
@@ -7,5 +9,8 @@ def npc():
 
 
 @npc.command()
-def summon():
+@click.pass_context
+def summon(ctx):
+    ctx.obj["setup_gas_strat"]()
+
     raise NotImplementedError

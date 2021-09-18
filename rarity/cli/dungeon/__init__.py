@@ -1,3 +1,4 @@
+import click
 from rarity.cli import rarity_cli
 
 
@@ -7,5 +8,8 @@ def dungeon():
 
 
 @dungeon.command()
-def create():
+@click.pass_context
+def create(ctx):
+    ctx.obj["setup_gas_strat"]()
+
     raise NotImplementedError

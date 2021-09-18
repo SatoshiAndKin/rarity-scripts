@@ -45,27 +45,28 @@ def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
     """Command line interface for Rarity."""
     assert brownie.chain.id == 250, "not Fantom network!"
 
-    brownie.accounts.default = lazy_account(account, passfile)
-
     print("\nConnected to", brownie.web3.provider.endpoint_uri)
-
-    last_block = brownie.chain[-1]
-    block_human_time = arrow.get(last_block.timestamp).humanize()
-    print(f"Last block: {last_block.number:_} @ {block_human_time}\n")
-
-    gas_strat = MinimumGasStrategy(gas_time, gas_extra)
-
-    print(gas_strat, "\n")
-    brownie.network.gas_price(gas_strat)
 
     ctx.ensure_object(dict)
 
-    ctx.obj.update(
-        {
-            # "account": brownie.accounts.default,
-            "gas_strat": gas_strat,
-        }
-    )
+    brownie.accounts.default = lazy_account(account, passfile)
+
+    # do gas strategy setup in a function so we can only call it if is needed
+    def setup_gas_strat():
+        last_block = brownie.chain[-1]
+        block_human_time = arrow.get(last_block.timestamp).humanize()
+        print(f"Last block: {last_block.number:_} @ {block_human_time}\n")
+
+        gas_strat = MinimumGasStrategy(gas_time, gas_extra)
+
+        print(gas_strat, "\n")
+        brownie.network.gas_price(gas_strat)
+
+        ctx.obj["gas_strat"] = gas_strat
+
+        del ctx.obj["setup_gas_strat"]
+
+    ctx.obj["setup_gas_strat"] = setup_gas_strat
 
 
 @rarity_cli.command()
@@ -73,6 +74,8 @@ def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
 def console(ctx):
     """Open an interactive console."""
     import IPython
+
+    ctx.obj["setup_gas_strat"]()
 
     IPython.start_ipython(argv=[], user_ns=common_helpers(ctx))
 
@@ -82,6 +85,9 @@ def console(ctx):
 @click.pass_context
 def run(ctx, python_code):
     """Exec arbitrary (and hopefully audited!) python code. Be careful with this!"""
+
+    ctx.obj["setup_gas_strat"]()
+
     print(eval(python_code, {}, common_helpers(ctx)))
 
 
@@ -90,4 +96,7 @@ def run(ctx, python_code):
 @click.pass_context
 def run_file(ctx, python_file):
     """Exec arbitrary (and hopefully audited!) python files. Be careful with this!"""
+
+    ctx.obj["setup_gas_strat"]()
+
     print(eval(python_file.read(), {}, common_helpers(ctx)))

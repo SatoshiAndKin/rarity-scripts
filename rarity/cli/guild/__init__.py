@@ -1,3 +1,5 @@
+import click
+
 from rarity.cli import rarity_cli
 
 
@@ -7,10 +9,16 @@ def guild():
 
 
 @guild.command()
-def found():
+@click.pass_context
+def found(ctx):
+    ctx.obj["setup_gas_strat"]()
+
     raise NotImplementedError
 
 
 @guild.command()
-def summon():
+@click.pass_context
+def summon(ctx):
+    ctx.obj["setup_gas_strat"]()
+
     raise NotImplementedError

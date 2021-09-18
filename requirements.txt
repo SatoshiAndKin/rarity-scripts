@@ -129,6 +129,10 @@ execnet==1.9.0
     # via
     #   eth-brownie
     #   pytest-xdist
+gql==2.0.0
+    # via rarity-scripts (setup.cfg)
+graphql-core==2.3.2
+    # via gql
 hexbytes==0.2.2
     # via
     #   eip712
@@ -225,6 +229,10 @@ pluggy==1.0.0
     # via
     #   eth-brownie
     #   pytest
+promise==2.3
+    # via
+    #   gql
+    #   graphql-core
 prompt-toolkit==3.0.20
     # via
     #   eth-brownie
@@ -302,6 +310,7 @@ regex==2021.8.28
 requests==2.26.0
     # via
     #   eth-brownie
+    #   gql
     #   ipfshttpclient
     #   py-solc-x
     #   pythx
@@ -312,6 +321,8 @@ rlp==1.2.0
     #   eth-account
     #   eth-brownie
     #   eth-rlp
+rx==1.6.1
+    # via graphql-core
 semantic-version==2.8.5
     # via
     #   eth-brownie
@@ -322,9 +333,12 @@ six==1.16.0
     # via
     #   asttokens
     #   eth-brownie
+    #   gql
+    #   graphql-core
     #   jsonschema
     #   multiaddr
     #   parsimonious
+    #   promise
     #   protobuf
     #   pytest-xdist
     #   python-dateutil
