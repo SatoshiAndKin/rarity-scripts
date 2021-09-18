@@ -2,21 +2,25 @@ import random
 
 import brownie
 import click
+from click_spinner import spinner
 
 from rarity.contracts import RARITY, RARITY_ATTRIBUTES, RARITY_SKILLS
 
 
 def summon(click_ctx):
-    account = brownie.accounts.default
+    # this will prompt the user to load their account
+    # if they type their passphrase wrong, best to quit now then after they've chosen stats
+    account_address = brownie.accounts.default.address
 
-    class_ids = list(range(1, 12))
+    print("Loading classes...")
+    with spinner():
+        class_ids = list(range(1, 12))
+        with brownie.multicall:
+            class_names = [RARITY.classes(i) for i in class_ids]
 
-    with brownie.multicall:
-        class_names = [RARITY.classes(i) for i in class_ids]
-
+    # pick a class
     for i, name in zip(class_ids, class_names):
         print(str(i).rjust(3), "-", name)
-
     class_id = click.prompt(
         "\nWhat class?",
         default=random.choice(class_ids),
@@ -26,7 +30,7 @@ def summon(click_ctx):
         show_default=True,
     )
 
-    # TODO: pick ability scores
+    # pick ability scores
     strength = None
     if click.confirm("Set ability scores?", default=True):
         if click.confirm("Set randomized ability scores?", default=True):
@@ -41,22 +45,32 @@ def summon(click_ctx):
             wisdom = click.prompt("WIS", type=score_type)
             charisma = click.prompt("CHA", type=score_type)
 
-    # TODO: pick skills?
+    # pick skills?
     skills = [0] * 36
     if click.confirm("Set skills?", default=True):
         raise NotImplementedError
 
     # print pending summoner stats
-    print("Class:", class_names[class_id])
+    print("\n")
+    print("*" * 80, "\n")
+    print("Class:", click.style(str(class_names[class_id]), fg="green"))
     if strength:
-        print("STR:", strength)
-        print("DEX:", dexterity)
-        print("CON:", constitution)
-        print("INT:", intelligence)
-        print("WIS:", wisdom)
-        print("CHA:", charisma)
+        print("STR:", click.style(strength, fg="green"))
+        print("DEX:", click.style(dexterity, fg="green"))
+        print("CON:", click.style(constitution, fg="green"))
+        print("INT:", click.style(intelligence, fg="green"))
+        print("WIS:", click.style(wisdom, fg="green"))
+        print("CHA:", click.style(charisma, fg="green"))
 
-    click.confirm("Are you sure?", abort=True, default=False)
+    click.confirm(
+        click.style(
+            "\nAre you sure you want to create this summoner? FTM will be spent!",
+            bold=True,
+            fg="yellow",
+        ),
+        abort=True,
+        default=False,
+    )
 
     summon_tx = RARITY.summon(class_id)
 
@@ -76,4 +90,4 @@ def summon(click_ctx):
     if sum(skills):
         RARITY_SKILLS.set_skills(summoner, skills).info()
 
-    print(f"{account} has summoned #{summoner:_}")
+    print(f"{account_address} has summoned #{summoner:_}")

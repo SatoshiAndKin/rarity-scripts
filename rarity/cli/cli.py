@@ -62,7 +62,7 @@ def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
 
     ctx.obj.update(
         {
-            "account": account,
+            # "account": brownie.accounts.default,
             "gas_strat": gas_strat,
         }
     )

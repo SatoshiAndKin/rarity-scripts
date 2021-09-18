@@ -55,6 +55,6 @@ def lazy_account(account_name, password_name):
 
     account = brownie.accounts.load(account_name, password=password)
 
-    print(f"\nHello, {account}!")
+    print(f"\nHello, {account}!\n")
 
     return account

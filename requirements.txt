@@ -56,6 +56,8 @@ click==8.0.1
     #   black
     #   eth-brownie
     #   rarity-scripts (setup.cfg)
+click-spinner==0.1.10
+    # via rarity-scripts (setup.cfg)
 cytoolz==0.11.0
     # via
     #   eth-brownie
