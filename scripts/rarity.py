@@ -4,5 +4,6 @@ that forwards everything to the [click application](https://click.palletsproject
 """
 from rarity import cli
 
+
 def main(*args):
     cli.main(*args)

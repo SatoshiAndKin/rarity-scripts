@@ -157,7 +157,9 @@ contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
 
             // we do NOT check success status. one might fail and the next could succeed
             if (actTarget != address(0)) {
-                (bool success, bytes memory ret) = actTarget.delegatecall(abi.encodeWithSignature("act(uint)", summoner));
+                (bool success, bytes memory ret) = actTarget.delegatecall(
+                    abi.encodeWithSignature("act(uint)", summoner)
+                );
 
                 if (!success) {
                     revert CallReverted(actTarget, true, abi.encodeWithSignature("act(uint)", summoner), ret);
@@ -244,7 +246,7 @@ contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
 
         // TODO: check skills and spend skill points (revert if not possible)
 
-        // contracts that extend NonPlayerCharacters can do whatever they want next. this will probably use the summoner's level
+        // contracts that extend NonPlayerCharacters can do whatever they want next
         _summon_setup_more(summoner, classData);
     }
 
@@ -285,7 +287,7 @@ contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
 
     /// @dev support ERC165
     function supportsInterface(bytes4 interfaceID) external pure returns (bool) {
-        return  interfaceID == 0x01ffc9a7 ||    // ERC-165 support (i.e. `bytes4(keccak256('supportsInterface(bytes4)'))`).
+        return  interfaceID == 0x01ffc9a7 ||    // ERC-165 support
                 interfaceID == 0x80ac58cd       // ERC-721 support
         ;
     }
@@ -294,7 +296,12 @@ contract NonPlayerCharacters is OwnedCloneable, RarityCommon {
     // TODO: have another contract that can receive any summoner? for now, the RarityGuild fills that role
     // TODO: or (since we check operator and not from) you can have a safe function that transferFroms valid summoers
     /// @dev the standard limits this to 30k gas, but RARITY does not
-    function onERC721Received(address operator, address /*from*/, uint summoner, bytes calldata) external returns(bytes4) {
+    function onERC721Received(
+        address operator,
+        address /*from*/,
+        uint summoner,
+        bytes calldata
+    ) external returns(bytes4) {
         require(RARITY.ownerOf(summoner) == address(this), "!rarity");
 
         // only allow summoners summoned by this contract. no external transfers allowed

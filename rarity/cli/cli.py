@@ -1,16 +1,19 @@
 import arrow
 import brownie
 import click
-import click_log
+from brownie._config import CONFIG
 
 from rarity.gas_strategy import MinimumGasStrategy
 
-from .cli_helpers import logger, common_helpers, lazy_account
+from .cli_helpers import common_helpers, lazy_account
 
 
 def main(*args):
     """Run the click app."""
-    click_log.basic_config(logger)
+
+    # TODO: https://github.com/eth-brownie/brownie/issues/1239
+    if "multicall2" not in CONFIG.active_network:
+        CONFIG.active_network["multicall2"] = "0xBAD2B082e2212DE4B065F636CA4e5e0717623d18"
 
     try:
         # https://click.palletsprojects.com/en/8.0.x/exceptions/#what-if-i-don-t-want-that
@@ -18,7 +21,7 @@ def main(*args):
             "brownie run rarity main",
             list(args),
             auto_envvar_prefix="RARITY",
-            help_option_names=['/h', '/help'],
+            help_option_names=["/h", "/help"],
         )
 
         with ctx:
@@ -31,7 +34,6 @@ def main(*args):
 
 
 @click.group()
-@click_log.simple_verbosity_option(logger)
 @click.option("/account", help="The brownie account to load")
 # TODO: click type for secure readable file
 @click.option("/passfile", help="DANGER! File that contains the account password. DANGER!")
@@ -43,7 +45,7 @@ def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
     """Command line interface for Rarity."""
     assert brownie.chain.id == 250, "not Fantom network!"
 
-    account = lazy_account(account, passfile)
+    brownie.accounts.default = lazy_account(account, passfile)
 
     print("\nConnected to", brownie.web3.provider.endpoint_uri)
 
@@ -58,10 +60,12 @@ def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
 
     ctx.ensure_object(dict)
 
-    ctx.obj.update({
-        "account": account,
-        "gas_strat": gas_strat,
-    })
+    ctx.obj.update(
+        {
+            "account": account,
+            "gas_strat": gas_strat,
+        }
+    )
 
 
 @rarity_cli.command()
@@ -77,9 +81,7 @@ def console(ctx):
 @click.argument("python_code", type=str)
 @click.pass_context
 def run(ctx, python_code):
-    """Exec arbitrary (and hopefully audited!) python code. Be careful with this!
-    
-    """
+    """Exec arbitrary (and hopefully audited!) python code. Be careful with this!"""
     print(eval(python_code, {}, common_helpers(ctx)))
 
 

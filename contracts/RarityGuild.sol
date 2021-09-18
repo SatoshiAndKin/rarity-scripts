@@ -25,8 +25,11 @@ contract RarityGuild is OwnedCloneable, RarityCommon {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
-    /// @dev data for a contract call
-    /// @dev be super careful with delegatecalls! do not delegatecall a contract that uses state! that can break our state!
+    /** @dev data for a contract call
+
+        be super careful with delegatecalls!
+        do not delegatecall a contract that uses state! that can break our state!
+     */
     struct Play {
         address target;
         bool delegateCall;
@@ -224,7 +227,12 @@ contract RarityGuild is OwnedCloneable, RarityCommon {
     //
 
     /// @notice allow receiving Rarity summoners from guild members
-    function onERC721Received(address /*operator*/, address /*from*/, uint256 summoner, bytes calldata) external returns(bytes4) {
+    function onERC721Received(
+        address /*operator*/,
+        address /*from*/,
+        uint256 summoner,
+        bytes calldata
+    ) external returns(bytes4) {
         require(RARITY.ownerOf(summoner) == address(this), "!rarity");
 
         // check the adventure log of the summoner. otherwise iterating the list of npcs gets weird

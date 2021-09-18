@@ -9,6 +9,7 @@ from eth_utils import keccak, to_bytes, to_checksum_address
 
 from rarity.web3_helpers import to_bytes32
 
+
 def calculate_create2_address(sender: str, initcode: str, salt: str = None) -> str:
     """Calculate the determinstic Create2 address."""
     sender_bytes = to_bytes(hexstr=sender)
@@ -38,9 +39,7 @@ def calculate_create2_address(sender: str, initcode: str, salt: str = None) -> s
     return to_checksum_address(address_bytes)
 
 
-def get_or_create(
-    account, contract, constructor_args=None, salt=None
-) -> Contract:
+def get_or_create(account, contract, constructor_args=None, salt=None) -> Contract:
     """Use CREATE2 and a set deployer address to deploy a contract with a deterministic address."""
     if constructor_args is None:
         constructor_args = []
@@ -50,9 +49,7 @@ def get_or_create(
     # SingletonFactory doesn't work on FTM. We use Andre's factory instead
     create2_deployer = Contract("0x54f5a04417e29ff5d7141a6d33cb286f50d5d50e")
 
-    contract_address = calculate_create2_address(
-        str(create2_deployer.address), contract_initcode, salt=salt
-    )
+    contract_address = calculate_create2_address(str(create2_deployer.address), contract_initcode, salt=salt)
 
     if web3.eth.get_code(contract_address).hex() == "0x":
         # the contract does not exist yet
@@ -65,12 +62,14 @@ def get_or_create(
     return contract.at(contract_address, account)
 
 
-def get_or_create_from_project(contract_name, constructor_args=None, salt=None):
+def contract_from_project(contract_name, constructor_args=None, salt=None):
     contract = getattr(brownie, contract_name)
+
+    return get_or_create(None, contract, constructor_args=constructor_args, salt=salt)
 
 
 lazy_contract = lazy_func(Contract)
-lazy_get_or_create_from_project = lazy_func(get_or_create_from_project)
+lazy_project_contract = lazy_func(contract_from_project)
 
 RARITY = lazy_contract("0xce761d788df608bd21bdd59d6f4b54b2e27f25bb")
 RARITY_ATTRIBUTES = lazy_contract("0xB5F5AF1087A8DA62A23b08C00C6ec9af21F397a1")
@@ -87,8 +86,8 @@ RARITY_CODEX_ITEMS_GOODS = lazy_contract("0x0C5C1CC0A7AE65FE372fbb08FF16578De4b9
 RARITY_CODEX_ITEMS_ARMOR = lazy_contract("0xf5114A952Aca3e9055a52a87938efefc8BB7878C")
 RARITY_CODEX_ITEMS_WEAPONS = lazy_contract("0xeE1a2EA55945223404d73C0BbE57f540BBAAD0D8")
 
-RARITY_ACTION_V2 = get_or_create_from_project("RarityActionsV2")
-RARITY_GUILD = get_or_create_from_project("RarityGuild")
+RARITY_ACTION_V2 = lazy_project_contract("RarityActionsV2")
+RARITY_GUILD = lazy_project_contract("RarityGuild")
 
 
 Summoner = namedtuple("Summoner", ["summoner", "xp", "log", "classId", "level"])

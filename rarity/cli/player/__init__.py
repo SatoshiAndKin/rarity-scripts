@@ -1,4 +1,7 @@
+import click
+
 from rarity.cli import rarity_cli
+
 
 @rarity_cli.group()
 def player():
@@ -6,7 +9,9 @@ def player():
 
 
 @player.command()
-def summon():
+@click.pass_context
+def summon(ctx):
     """Summon a new player character."""
     from .summon import summon
-    summon()
+
+    summon(ctx)
