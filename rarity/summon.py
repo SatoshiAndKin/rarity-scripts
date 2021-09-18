@@ -1,10 +1,12 @@
 import random
+from rarity.ability_scores import AbilityScores
 
 import brownie
 import click
 from click_spinner import spinner
 
 from rarity.contracts import RARITY, RARITY_ATTRIBUTES, RARITY_SKILLS
+from rarity.ability_scores import get_good_random_scores
 
 
 def summon(click_ctx):
@@ -12,7 +14,7 @@ def summon(click_ctx):
     # if they type their passphrase wrong, best to quit now then after they've chosen stats
     account_address = brownie.accounts.default.address
 
-    print("Loading classes...")
+    print("Classes...")
     with spinner():
         class_ids = list(range(1, 12))
         with brownie.multicall:
@@ -31,10 +33,16 @@ def summon(click_ctx):
     )
 
     # pick ability scores
-    strength = None
+    ability_scores = None
     if click.confirm("Set ability scores?", default=True):
-        if click.confirm("Set randomized ability scores?", default=True):
-            raise NotImplementedError
+        if click.confirm("Get good randomized ability scores?", default=True):
+            while True:
+                ability_scores = get_good_random_scores(class_id)
+
+                print(ability_scores)
+
+                if click.confirm("Use these scores?", default=True):
+                    break
         else:
             score_type = click.IntRange(8, 22)
 
@@ -48,7 +56,9 @@ def summon(click_ctx):
 
                 print("Calculating...")
                 with spinner():
-                    points_spent = RARITY_ATTRIBUTES.calculate_point_buy(strength, dexterity, constitution, intelligence, wisdom, charisma)
+                    points_spent = RARITY_ATTRIBUTES.calculate_point_buy(
+                        strength, dexterity, constitution, intelligence, wisdom, charisma
+                    )
 
                 if points_spent == 32:
                     break
@@ -61,23 +71,24 @@ def summon(click_ctx):
 
                 print("Try again...")
 
+            ability_scores = AbilityScores(strength, dexterity, constitution, intelligence, wisdom, charisma)
 
     # pick skills?
     skills = [0] * 36
     if click.confirm("Set skills?", default=True):
-        raise NotImplementedError
+        print(click.style("Sorry! Setting skills is not yet supported. You'll have to use the console to do that.", fg="yellow"))
 
     # print pending summoner stats
     print("\n")
     print("*" * 80, "\n")
     print("Class:", click.style(str(class_names[class_id - 1]), fg="green"))
-    if strength:
-        print("STR:", click.style(strength, fg="green"))
-        print("DEX:", click.style(dexterity, fg="green"))
-        print("CON:", click.style(constitution, fg="green"))
-        print("INT:", click.style(intelligence, fg="green"))
-        print("WIS:", click.style(wisdom, fg="green"))
-        print("CHA:", click.style(charisma, fg="green"))
+    if ability_scores:
+        print()
+        print(click.style(ability_scores, fg="green"))
+    if sum(skills):
+        print()
+        print("Skills:")
+        print(click.style(skills, fg="green"))
 
     click.confirm(
         click.style(
@@ -101,8 +112,16 @@ def summon(click_ctx):
         click_ctx.obj["summoners"] = set()
     click_ctx.obj["summoners"].add(summoner)
 
-    if strength:
-        RARITY_ATTRIBUTES.point_buy(summoner, strength, dexterity, constitution, intelligence, wisdom, charisma).info()
+    if ability_scores:
+        RARITY_ATTRIBUTES.point_buy(
+            summoner,
+            ability_scores.STR,
+            ability_scores.DEX,
+            ability_scores.CON,
+            ability_scores.INT,
+            ability_scores.WIS,
+            ability_scores.CHA,
+        ).info()
 
     if sum(skills):
         RARITY_SKILLS.set_skills(summoner, skills).info()

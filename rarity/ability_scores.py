@@ -1,12 +1,13 @@
 # see arrays.html
 import random
 from collections import namedtuple
-from enum import IntEnum
 from itertools import permutations
 from typing import DefaultDict
 
-from rarity.game import RarityBaseClass
+from .game import RarityBaseClass, Ability
 
+
+AbilityScores = namedtuple("AbilityScores", ["STR", "DEX", "CON", "INT", "WIS", "CHA"])
 
 # TODO: calculate this in python instead of misc/point-buy.html
 all_attribute_permutations = [
@@ -299,15 +300,6 @@ all_attribute_permutations = [
 ]
 
 
-class Ability(IntEnum):
-    STR = 1
-    DEX = 2
-    CON = 3
-    INT = 4
-    WIS = 5
-    CHA = 6
-
-
 MIN_MIN_DUMP_STATS = 0
 MAX_MAX_DUMP_STATS = 4
 # TODO: range on this? sometimes 2 or 3 odds can be good (racial ability mods and magic items)
@@ -316,6 +308,7 @@ MAX_ODD_SCORES = 1
 AttributeBounds = namedtuple("AbilityBounds", ["min_dump_stats", "max_dump_stats", "ability_rankings"])
 
 
+# TODO: load these out of a config file or something
 ability_orders = {
     RarityBaseClass.BARBARIAN: [
         [
@@ -632,7 +625,7 @@ def get_ability_orders(classId: RarityBaseClass):
     return list(possibilities)
 
 
-def get_random_scores(classId: RarityBaseClass):
+def get_good_random_scores(classId: RarityBaseClass):
     ability_order = random.choice(get_ability_orders(classId))
 
     # print("ability_order:", ability_order)
@@ -652,5 +645,15 @@ def get_random_scores(classId: RarityBaseClass):
 
     ability_scores = random.choice(ranked_scores[rank])
 
-    # TODO: return as a list?
-    return {a: s for (a, s) in zip(ability_order, ability_scores)}
+    ability_scores = {a: s for (a, s) in zip(ability_order, ability_scores)}
+
+    ordered_scores = AbilityScores(
+        ability_scores[1],
+        ability_scores[2],
+        ability_scores[3],
+        ability_scores[4],
+        ability_scores[5],
+        ability_scores[6],
+    )
+
+    return ordered_scores

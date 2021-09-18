@@ -12,7 +12,7 @@ def player():
 @click.pass_context
 def summon(ctx):
     """Summon a new player character."""
-    from .summon import summon
+    from rarity.summon import summon
 
     ctx.obj["setup_gas_strat"]()
 

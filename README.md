@@ -188,7 +188,7 @@ If you think you will survive, enter the dungeon:
 
 Then, repeat these until your summoner has returned:
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" dungeon choose "$DUNGEON_ADDR" "$SUMMONER_ID"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" dungeon play "$DUNGEON_ADDR" "$SUMMONER_ID"
 
 ### Advanced: Open a bash shell
 

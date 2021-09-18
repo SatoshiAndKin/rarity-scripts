@@ -11,6 +11,7 @@ def guild():
 @guild.command()
 @click.pass_context
 def found(ctx):
+    """Found a new guild."""
     ctx.obj["setup_gas_strat"]()
 
     raise NotImplementedError
@@ -19,6 +20,7 @@ def found(ctx):
 @guild.command()
 @click.pass_context
 def summon(ctx):
+    """Create a summoner for your guild."""
     ctx.obj["setup_gas_strat"]()
 
     raise NotImplementedError
