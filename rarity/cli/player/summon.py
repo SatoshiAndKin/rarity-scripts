@@ -38,12 +38,29 @@ def summon(click_ctx):
         else:
             score_type = click.IntRange(8, 22)
 
-            strength = click.prompt("STR", type=score_type)
-            dexterity = click.prompt("DEX", type=score_type)
-            constitution = click.prompt("CON", type=score_type)
-            intelligence = click.prompt("INT", type=score_type)
-            wisdom = click.prompt("WIS", type=score_type)
-            charisma = click.prompt("CHA", type=score_type)
+            while True:
+                strength = click.prompt("STR", type=score_type)
+                dexterity = click.prompt("DEX", type=score_type)
+                constitution = click.prompt("CON", type=score_type)
+                intelligence = click.prompt("INT", type=score_type)
+                wisdom = click.prompt("WIS", type=score_type)
+                charisma = click.prompt("CHA", type=score_type)
+
+                print("Calculating...")
+                with spinner():
+                    points_spent = RARITY_ATTRIBUTES.calculate_point_buy(strength, dexterity, constitution, intelligence, wisdom, charisma)
+
+                if points_spent == 32:
+                    break
+                if points_spent < 32:
+                    if click.confirm(f"You only spent {points_spent}/32 points. Are you sure?", default=False):
+                        break
+                else:
+                    # points_spent >32
+                    print(f"You spent {points_spent}/32 points. That isn't valid")
+
+                print("Try again...")
+
 
     # pick skills?
     skills = [0] * 36
@@ -53,7 +70,7 @@ def summon(click_ctx):
     # print pending summoner stats
     print("\n")
     print("*" * 80, "\n")
-    print("Class:", click.style(str(class_names[class_id]), fg="green"))
+    print("Class:", click.style(str(class_names[class_id - 1]), fg="green"))
     if strength:
         print("STR:", click.style(strength, fg="green"))
         print("DEX:", click.style(dexterity, fg="green"))

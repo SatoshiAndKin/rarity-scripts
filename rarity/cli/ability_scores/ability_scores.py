@@ -5,7 +5,7 @@ from enum import IntEnum
 from itertools import permutations
 from typing import DefaultDict
 
-from .rarity_logic import RarityBaseClass
+from rarity.game import RarityBaseClass
 
 
 # TODO: calculate this in python instead of misc/point-buy.html

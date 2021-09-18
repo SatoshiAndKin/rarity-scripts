@@ -133,7 +133,11 @@ contract RarityActionsV2 is DelegateGuard, RarityCommon {
         }
     }
 
-    function summon(uint amount, uint class, IRarityAttributes.ability_score calldata ability_score) external {
+    function summon(
+        uint amount,
+        uint class,
+        IRarityAttributes.ability_score calldata ability_score
+    ) external {
         requireDelegateCall();
 
         uint summoner;
@@ -153,6 +157,7 @@ contract RarityActionsV2 is DelegateGuard, RarityCommon {
                     ability_score.charisma
                 );
             }
+            // to set skills, call "setSkills"
         }
     }
 
