@@ -8,6 +8,8 @@ aiohttp==3.7.4.post0
     # via
     #   eth-brownie
     #   web3
+appnope==0.1.2
+    # via ipython
 arrow==1.1.1
     # via rarity-scripts (setup.cfg)
 asttokens==2.0.4
@@ -25,6 +27,8 @@ attrs==21.2.0
     #   hypothesis
     #   jsonschema
     #   pytest
+backcall==0.2.0
+    # via ipython
 base58==2.1.0
     # via
     #   eth-brownie
@@ -64,6 +68,8 @@ dataclassy==0.10.4
     # via
     #   eip712
     #   eth-brownie
+decorator==5.1.0
+    # via ipython
 eip712==0.1.0
     # via eth-brownie
 eth-abi==2.1.1
@@ -152,6 +158,10 @@ ipfshttpclient==0.8.0a2
     # via
     #   eth-brownie
     #   web3
+ipython==7.27.0
+    # via rarity-scripts (setup.cfg)
+jedi==0.18.0
+    # via ipython
 jsonschema==3.2.0
     # via
     #   eth-brownie
@@ -167,6 +177,8 @@ lru-dict==1.1.7
     # via
     #   eth-brownie
     #   web3
+matplotlib-inline==0.1.3
+    # via ipython
 multiaddr==0.0.9
     # via
     #   eth-brownie
@@ -196,10 +208,16 @@ parsimonious==0.8.1
     # via
     #   eth-abi
     #   eth-brownie
+parso==0.8.2
+    # via jedi
 pathspec==0.9.0
     # via
     #   black
     #   eth-brownie
+pexpect==4.8.0
+    # via ipython
+pickleshare==0.7.5
+    # via ipython
 platformdirs==2.3.0
     # via
     #   black
@@ -209,13 +227,17 @@ pluggy==1.0.0
     #   eth-brownie
     #   pytest
 prompt-toolkit==3.0.20
-    # via eth-brownie
+    # via
+    #   eth-brownie
+    #   ipython
 protobuf==3.17.3
     # via
     #   eth-brownie
     #   web3
 psutil==5.8.0
     # via eth-brownie
+ptyprocess==0.7.0
+    # via pexpect
 py==1.10.0
     # via
     #   eth-brownie
@@ -235,6 +257,7 @@ pycryptodome==3.10.1
 pygments==2.10.0
     # via
     #   eth-brownie
+    #   ipython
     #   pygments-lexer-solidity
 pygments-lexer-solidity==0.7.0
     # via eth-brownie
@@ -324,6 +347,10 @@ toolz==0.11.1
     #   eth-brownie
 tqdm==4.62.2
     # via eth-brownie
+traitlets==5.1.0
+    # via
+    #   ipython
+    #   matplotlib-inline
 typing-extensions==3.10.0.2
     # via
     #   aiohttp

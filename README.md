@@ -28,7 +28,7 @@ You can add "/help" to the end of any command to see more information.
 
 NOTE: Brownie's flags (like "--help") start with "--". Rarity's flags start with "/". This is so the scripts can easily tell flags apart.
 
-### Setup your account
+### Setup Your Account
 
     ~/bin/play-rarity.sh accounts from_mnemonic
 
@@ -36,7 +36,7 @@ Follow the prompts to setup your account. The account's key will be encrypted wi
 
 Replace "$ACCOUNT" in any other command with the account name that you chose.
 
-### Get some FTM
+### Get Some FTM
 
 In order to send any transactions, your account will need some [FTM](https://fantom.foundation/) on the Fantom chain.
 
@@ -56,13 +56,17 @@ Bridges:
 - <https://multichain.xyz/>
 - <https://docs.spookyswap.finance/links/bridge-to-fantom-opera>
 
-### Create a summoner
+### Create a Summoner
 
     ~/bin/play-rarity.sh /account "$ACCOUNT" player summon
 
 Follow the prompts to build a summoner.
 
-### Interactive console
+### Send your Summoners on Adventures
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" player adventure
+
+### Interactive Console
 
     ~/bin/play-rarity.sh /account "$ACCOUNT" console
 
@@ -90,7 +94,7 @@ Be **VERY** careful with who you invite! Any member can take everything from the
 
 More advanced security is planned.
 
-### Create an NPC Town for your Guild
+### Create an NPC Town for Your Guild
 
     ~/bin/play-rarity.sh /account "$ACCOUNT" npc create_town "$GUILD_ADDR"
 
@@ -98,17 +102,23 @@ Follow the prompts to create a town full of multiple NPCs. Only the guild can in
 
 Towns that are open for any player to interact with are planned.
 
-### Enroll your summoner in your Guild
+### Enroll Your Summoner in Your Guild
 
     ~/bin/play-rarity.sh /account "$ACCOUNT" guild enroll_summoner "$GUILD_ADDR" "$SUMMONER_ID"
 
-Allow your guildmates to control your summoner.
+Allow your guildmates to control your summoner. You will retain ownership of the summoner, but the guild can take it.
 
-### Transfer your summoner to your guild
+### Summon for Your Guild
 
     ~/bin/play-rarity.sh /account "$ACCOUNT" guild summon "$GUILD_ADDR"
 
-Follow the prompts to give your guild a summoner.
+Follow the prompts to craete a summoner for your guild.
+
+### Give a summoner to Your Guild
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild give_summoner "$GUILD_ADDR" "$SUMMONER_ID"
+
+Give a summoner that you control to your guild.
 
 ### Remove a summoner from your Guild
 
