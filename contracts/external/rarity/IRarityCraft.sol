@@ -32,7 +32,12 @@ interface IRarityCraft {
     function modifier_for_attribute(uint _attribute) external pure returns (int _modifier);
     function craft_skillcheck(uint _summoner, uint _dc) external view returns (bool crafted, int check);
     function isValid(uint _base_type, uint _item_type) external pure returns (bool);
-    function simulate(uint _summoner, uint _base_type, uint _item_type, uint _crafting_materials) external view returns (
+    function simulate(
+        uint _summoner,
+        uint _base_type,
+        uint _item_type,
+        uint _crafting_materials
+    ) external view returns (
         bool crafted,
         int check,
         uint cost,

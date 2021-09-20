@@ -76,7 +76,11 @@ def summon(click_ctx):
     # pick skills?
     skills = [0] * 36
     if click.confirm("Set skills?", default=True):
-        print(click.style("Sorry! Setting skills is not yet supported. You'll have to use the console to do that.", fg="yellow"))
+        print(
+            click.style(
+                "Sorry! Setting skills is not yet supported. You'll have to use the console to do that.", fg="yellow"
+            )
+        )
 
     # print pending summoner stats
     print("\n")
