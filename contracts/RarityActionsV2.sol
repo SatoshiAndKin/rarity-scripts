@@ -36,14 +36,6 @@ contract RarityActionsV2 is DelegateGuard, RarityCommon {
         }
     }
 
-    function craft(uint[] calldata summoners, uint spender, uint moreargsneededhere) external {
-        uint length = summoners.length;
-        for (uint i = 0; i < length; i++) {
-            requireAuthSummoner(summoners[i]);
-            revert("under construction");
-        }
-    }
-
     function distantAdventure(uint[] calldata summoners, IRarityAdventure quest) external {
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
@@ -138,7 +130,8 @@ contract RarityActionsV2 is DelegateGuard, RarityCommon {
         uint class,
         IRarityAttributes.ability_score calldata ability_score
     ) external {
-        requireDelegateCall();
+        // transfer the summoner if we aren't in a DELEGATECALL
+        bool transfer_summoner = address(this) == original;
 
         uint summoner;
         for (uint i = 0; i < amount; i++) {
@@ -158,6 +151,10 @@ contract RarityActionsV2 is DelegateGuard, RarityCommon {
                 );
             }
             // to set skills, call "setSkills"
+
+            if (transfer_summoner) {
+                RARITY.safeTransferFrom(address(this), msg.sender, summoner);
+            }
         }
     }
 

@@ -9,14 +9,14 @@ import brownie
 import click
 
 
-def account_from_mnemonic(mnemonic, mnemonic_passphrase, offset, output, encryption_passphrase, save_pass=False):
+def account_from_mnemonic(mnemonic, mnemonic_passphrase, offset, account_name, encryption_passphrase, save_pass=False):
     # TODO: allow creating more than one at a time. but then how should we handle key-name?
     account = brownie.accounts.from_mnemonic(mnemonic, count=1, offset=offset, passphrase=mnemonic_passphrase)
 
-    click.confirm(f"Save {account} @ {output}?", abort=True)
+    click.confirm(f"Save {account} @ {account_name}?", abort=True)
 
     if save_pass:
-        pass_filename = f"{output}.pass"
+        pass_filename = f"{account_name}.pass"
 
         accounts = Path.home() / ".brownie" / "accounts"
 
@@ -39,6 +39,6 @@ def account_from_mnemonic(mnemonic, mnemonic_passphrase, offset, output, encrypt
 
         pass_file.chmod(0o400)
 
-    account.save(output, password=encryption_passphrase)
+    account.save(account_name, password=encryption_passphrase)
 
     return account

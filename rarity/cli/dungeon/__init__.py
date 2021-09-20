@@ -18,6 +18,15 @@ def create(ctx):
 
 @dungeon.command()
 @click.pass_context
+def scout(ctx):
+    """Enter an adventure."""
+    ctx.obj["setup_gas_strat"]()
+
+    raise NotImplementedError
+
+
+@dungeon.command()
+@click.pass_context
 def adventure(ctx):
     """Enter an adventure."""
     ctx.obj["setup_gas_strat"]()

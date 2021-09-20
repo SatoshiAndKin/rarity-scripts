@@ -86,14 +86,6 @@ Follow the prompts to create a guild.
 
 At the end, you will be given an address. Save this address! Replace "$GUILD_ADDR" in any later command with this address.
 
-### Create a summoner for your Guild
-
-**UNDER CONSTRUCTION!**
-
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild summon "$GUILD_ADDR"
-
-Follow the prompts to build a summoner.
-
 ### Invite Someone to your Guild
 
 **UNDER CONSTRUCTION!**
