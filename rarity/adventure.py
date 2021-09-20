@@ -33,17 +33,12 @@ def adventure(with_level_up) -> int:
     # Version numbering is going to be tedious. so is approving every time a new contract comes out
     # get our clone proxies deployed on FTM and then approve that instead?
 
-    print("Querying adventure's logs and scouting...")
+    print("Querying approvals and adventure's logs...")
     with spinner():
         with brownie.multicall:
             approvals = [(RARITY.getApproved(s.summoner), s) for s in summoners]
             adventurers_logs = [(RARITY.adventurers_log(s.summoner), s) for s in summoners]
             materials_1_logs = [(RARITY_MATERIALS_1.adventurers_log(s.summoner), s) for s in summoners]
-            # TODO: get level
-
-    # pprint(approvals)
-    pprint(adventurers_logs)
-    # pprint(materials_1_logs)
 
     print("Setting up approvals...")
     if not RARITY.isApprovedForAll.call(account_address, RARITY_ACTION_V2):
@@ -56,20 +51,20 @@ def adventure(with_level_up) -> int:
             RARITY.approve(RARITY_ACTION_V2, summoner.summoner, {"from": account_address, "required_confs": 0})
 
     print("waiting for confirmations...")
+    # we want our approvals confirmed before we do other transactions, otherwise we can get false reverts
     with spinner():
         brownie.history.wait()
 
+    # calculate next run time based off the adventurers logs
     now = brownie.chain[-1].timestamp
-
     next_run = now + 86400
-
     for (next_adventure_timestamp, _) in itertools.chain(adventurers_logs, materials_1_logs):
         if now < next_adventure_timestamp:
             next_run = next_adventure_timestamp + 1
             break
 
-    print("now:", now)
-    print("next_run:", next_run)
+    # track xp gained this run
+    new_xp = {}
 
     # filter out adventurers that have adventured too recently
     adventurers = [s.summoner for (l, s) in adventurers_logs if now > l]
@@ -78,26 +73,27 @@ def adventure(with_level_up) -> int:
         # TODO: if connected to ganache, use grouper
         group_size = len(adventurers)
         for a in grouper(adventurers, group_size, None):
-            # RARITY_ACTION_V2.adventure(list(filter(None, a)), {"required_confs": 0})
-            pass
+            RARITY_ACTION_V2.adventure(list(filter(None, a)), {"required_confs": 0})
 
-    # level up automatically? if we want to craft something, we don't want to!
+        for a in adventurers:
+            new_xp[a] = 250e18
+
+    # if we want to craft something, we should not level up! 
     if with_level_up:
         leveled_summoners = [
             s.summoner
             for s in summoners
-            if s.xp >= get_xp_required(s.level)
+            if s.xp + new_xp.get(s.summoner, 0) >= get_xp_required(s.level)
         ]
         print(f"{account_address} has {len(leveled_summoners)} summoners ready for leveling up")
         if leveled_summoners:
-            group_size = 1  # len(leveled_summoners)
+            group_size = len(leveled_summoners)
             for a in grouper(leveled_summoners, group_size, None):
-                # TODO: levelUpAndClaimGold once i figure out approvals
-                # RARITY_ACTION_V2.levelUp(list(filter(None, a)), {"required_confs": 0})
-                pass
+                RARITY_ACTION_V2.levelUp(list(filter(None, a)), {"required_confs": 0})
 
-    # TODO: check claimable gold here instead?
+    # TODO: check claimable gold here (or figure out approvals and do levelUpAndClaimGold)
 
+    now = brownie.chain[-1].timestamp
     materials_1_adventurers = [
         s.summoner
         for (next_adventure_timestamp, s) in materials_1_logs
@@ -110,7 +106,7 @@ def adventure(with_level_up) -> int:
                 materials_1_scout = [(RARITY_MATERIALS_1.scout(s), s) for s in materials_1_adventurers]
 
             materials_1_adventurers = [
-                s
+                s.summoner
                 for (i, s) in enumerate(materials_1_adventurers)
                 if materials_1_scout[i][0] > 0
             ]
@@ -120,8 +116,7 @@ def adventure(with_level_up) -> int:
         if materials_1_adventurers:
             group_size = len(materials_1_adventurers)
             for a in grouper(materials_1_adventurers, group_size, None):
-                # RARITY_ACTION_V2.distantAdventure(list(filter(None, a)), RARITY_MATERIALS_1, {"required_confs": 0})
-                pass
+                RARITY_ACTION_V2.distantAdventure(list(filter(None, a)), RARITY_MATERIALS_1, {"required_confs": 0})
     else:
         print(f"{account_address} has {len(materials_1_adventurers)} summoners ready for collecting materials 1")
 
@@ -136,6 +131,9 @@ def adventure(with_level_up) -> int:
 
     print("adventuring complete!")
 
+    now = brownie.chain[-1].timestamp
     print("next run needed in", next_run - now, "seconds")
 
-    return next_run - now
+    next_run_in = max(next_run - now, 0)
+
+    return next_run_in
