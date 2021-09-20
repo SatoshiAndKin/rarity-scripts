@@ -64,11 +64,23 @@ Bridges:
 
 Follow the prompts to build a summoner.
 
-### Send your Summoners on Adventures
-
-**UNDER CONSTRUCTION!**
+### Send Your Summoners on Adventures
 
     ~/bin/play-rarity.sh /account "$ACCOUNT" player adventure
+
+This will adventure for XP, level up, and collect Crafting Materials I.
+
+TODO: claim gold
+
+### Automatically Send Your Summoners on Adventures
+
+Like `player adventure` but runs in a loop forever.
+
+    ~/bin/play-rarity.sh /account "$ACCOUNT" player idle-adventure
+
+This will adventure for XP, level up, and collect Crafting Materials I.
+
+TODO: claim gold
 
 ### Interactive Console
 

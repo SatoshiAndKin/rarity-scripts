@@ -18,13 +18,13 @@ contract RarityActionCraft1 {
 
         bool use_crafting_mats = _crafting_materials > 0;
         // TODO: store this in an immutable on RarityCommon
-        uint craft_summoner_id = RARITY_CRAFT_1.SUMMMONER_ID();
+        uint craft_summoner_id = RARITY_CRAFTING_1.SUMMMONER_ID();
 
         uint length = summoners.length;
         for (uint i = 0; i < length; i++) {
             requireAuthSummoner(summoners[i]);
 
-            (bool crafted,, uint cost,) = RARITY_CRAFT_1.simulate(summoners[i], _base_type, _item_type, _crafting_materials);
+            (bool crafted,, uint cost,) = RARITY_CRAFTING_1.simulate(summoners[i], _base_type, _item_type, _crafting_materials);
 
             if (crafted) {
                 if (transfer_summoner) {
@@ -32,15 +32,15 @@ contract RarityActionCraft1 {
                 }
 
                 if (use_crafting_mats) {
-                    RARITY_CRAFT_MATS_1.transfer(mats_summoner, summoners[i], _crafting_materials);
-                    RARITY_CRAFT_MATS_1.approve(summoners[i], craft_summoner_id, _crafting_materials);
+                    RARITY_MATERIALS_1.transfer(mats_summoner, summoners[i], _crafting_materials);
+                    RARITY_MATERIALS_1.approve(summoners[i], craft_summoner_id, _crafting_materials);
                 }
 
                 RARITY_GOLD.transfer(gold_summoner, summoners[i], cost);
                 RARITY_GOLD.approve(summoners[i], craft_summoner_id, cost);
 
-                RARITY.approve(address(RARITY_CRAFT_1), summoners[i]);
-                RARITY_CRAFT_1.craft(summoners[i], _base_type, _item_type, _crafting_materials);
+                RARITY.approve(address(RARITY_CRAFTING_1), summoners[i]);
+                RARITY_CRAFTING_1.craft(summoners[i], _base_type, _item_type, _crafting_materials);
 
                 if (transfer_summoner) {
                     RARITY.safeTransferFrom(address(this), msg.sender, summoners[i]);

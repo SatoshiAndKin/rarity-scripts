@@ -41,6 +41,8 @@ def calculate_create2_address(sender: str, initcode: str, salt: str = None) -> s
 
 def get_or_create(account, contract, constructor_args=None, salt=None) -> Contract:
     """Use CREATE2 and a set deployer address to deploy a contract with a deterministic address."""
+    account = account or brownie.accounts.default
+
     if constructor_args is None:
         constructor_args = []
 
@@ -73,7 +75,7 @@ lazy_project_contract = lazy_func(contract_from_project)
 
 RARITY = lazy_contract("0xce761d788df608bd21bdd59d6f4b54b2e27f25bb")
 RARITY_ATTRIBUTES = lazy_contract("0xB5F5AF1087A8DA62A23b08C00C6ec9af21F397a1")
-RARITY_CRAFT_1 = lazy_contract("0x2A0F1cB17680161cF255348dDFDeE94ea8Ca196A")
+RARITY_MATERIALS_1 = lazy_contract("0x2A0F1cB17680161cF255348dDFDeE94ea8Ca196A")
 RARITY_CRAFTING_1 = lazy_contract("0x3FC0539D1a0737FCA3e4556A990AAE1C38425F14")
 RARITY_GOLD = lazy_contract("0x2069B76Afe6b734Fb65D1d099E7ec64ee9CC76B2")
 RARITY_SKILLS = lazy_contract("0x51C0B29A1d84611373BA301706c6B4b72283C80F")
@@ -93,7 +95,7 @@ RARITY_GUILD = lazy_project_contract("RarityGuild")
 Summoner = namedtuple("Summoner", ["summoner", "xp", "log", "classId", "level"])
 
 
-class RarityBaseClass(IntEnum):
+class SummonerClass(IntEnum):
     # NONE = 0
     BARBARIAN = 1
     BARD = 2
@@ -109,51 +111,3 @@ class RarityBaseClass(IntEnum):
 
 
 # TODO: enum for prestige classes
-
-
-def grouper(iterable, n, fillvalue=None):
-    """Collect data into fixed-length chunks or blocks
-    https://docs.python.org/3/library/itertools.html
-    """
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-    args = [iter(iterable)] * n
-    return itertools.zip_longest(*args, fillvalue=fillvalue)
-
-
-def get_summoners(account, limit=1000):
-    # Select your transport with a defined url endpoint
-    transport = RequestsHTTPTransport(url="https://api.thegraph.com/subgraphs/name/eabz/rarity")
-
-    # Create a GraphQL client using the defined transport
-    client = Client(transport=transport, fetch_schema_from_transport=True)
-
-    # TODO: compare graphql result with balanceOf
-    # TODO: also query level and class? anything else? gold?
-    # TODO: how should we paginate? https://thegraph.com/docs/developer/graphql-api#pagination isn't working for me
-    query = gql(
-        """
-    {{
-        summoners(where: {{owner: "{account}"}}, first: {limit}) {{
-            id
-            }}
-    }}
-    """.format(
-            account=account.address.lower(),
-            limit=limit,
-        )
-    )
-
-    result = client.execute(query)
-
-    # TODO: scan transactions for new summoners if the balance doesn't match
-
-    summoners = [x["id"] for x in result["summoners"]]
-
-    # the graph might be behind, so get the data out of the chain
-    with multicall:
-        summoners = [(s, RARITY.summoner(s)) for s in summoners]
-
-    # (uint _xp, uint _log, uint _class, uint _level)
-    summoners = [Summoner(s, *x) for (s, x) in summoners]
-
-    return summoners

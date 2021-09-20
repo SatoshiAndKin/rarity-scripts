@@ -1,12 +1,69 @@
+from collections import namedtuple
+import functools
 import random
-from rarity.ability_scores import AbilityScores
 
 import brownie
 import click
 from click_spinner import spinner
+from gql import Client, gql
+from gql.transport.requests import RequestsHTTPTransport
 
 from rarity.contracts import RARITY, RARITY_ATTRIBUTES, RARITY_SKILLS
-from rarity.ability_scores import get_good_random_scores
+from rarity.ability_scores import AbilityScores, get_good_random_scores
+
+
+
+Summoner = namedtuple("Summoner", ["summoner", "xp", "log", "classId", "level"])
+
+
+
+def get_summoners(address, limit=1000):
+    # Select your transport with a defined url endpoint
+    transport = RequestsHTTPTransport(url="https://api.thegraph.com/subgraphs/name/eabz/rarity")
+
+    # Create a GraphQL client using the defined transport
+    client = Client(transport=transport, fetch_schema_from_transport=True)
+
+    # TODO: compare graphql result with balanceOf
+    # TODO: also query level and class? anything else? gold?
+    # TODO: how should we paginate? https://thegraph.com/docs/developer/graphql-api#pagination isn't working for me
+    query = gql(
+        """
+    {{
+        summoners(where: {{owner: "{address}"}}, first: {limit}) {{
+            id
+            }}
+    }}
+    """.format(
+            address=address.lower(),
+            limit=limit,
+        )
+    )
+
+    result = client.execute(query)
+
+    # TODO: scan transactions for new summoners if the balance doesn't match
+
+    summoners = [x["id"] for x in result["summoners"]]
+
+    # the graph might be behind, so get the data out of the chain
+    with brownie.multicall:
+        summoners = [(s, RARITY.summoner(s)) for s in summoners]
+
+    # (uint _xp, uint _log, uint _class, uint _level)
+    summoners = [Summoner(s, *x) for (s, x) in summoners]
+
+    return summoners
+
+
+@functools.cache
+def get_xp_required(current_level) -> int:
+    xp_to_next_level = current_level * 1000e18
+
+    for _ in range(1, current_level):
+        xp_to_next_level += current_level * 1000e18
+
+    return int(xp_to_next_level)
 
 
 def summon(click_ctx):

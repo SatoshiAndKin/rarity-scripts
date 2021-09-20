@@ -1,10 +1,19 @@
-# see arrays.html
 import random
 from collections import namedtuple
+from enum import IntEnum
 from itertools import permutations
 from typing import DefaultDict
 
-from .game import RarityBaseClass, Ability
+from .classes import SummonerClass
+
+
+class Ability(IntEnum):
+    STR = 1
+    DEX = 2
+    CON = 3
+    INT = 4
+    WIS = 5
+    CHA = 6
 
 
 AbilityScores = namedtuple("AbilityScores", ["STR", "DEX", "CON", "INT", "WIS", "CHA"])
@@ -310,7 +319,7 @@ AttributeBounds = namedtuple("AbilityBounds", ["min_dump_stats", "max_dump_stats
 
 # TODO: load these out of a config file or something
 ability_orders = {
-    RarityBaseClass.BARBARIAN: [
+    SummonerClass.BARBARIAN: [
         [
             # tier 1
             (
@@ -327,7 +336,7 @@ ability_orders = {
             (Ability.INT,),
         ]
     ],
-    RarityBaseClass.BARD: [
+    SummonerClass.BARD: [
         [
             # tier 1
             (Ability.CHA,),
@@ -343,7 +352,7 @@ ability_orders = {
             ),
         ]
     ],
-    RarityBaseClass.CLERIC: [
+    SummonerClass.CLERIC: [
         [
             # tier 1
             (Ability.WIS,),
@@ -373,7 +382,7 @@ ability_orders = {
             (Ability.INT,),
         ],
     ],
-    RarityBaseClass.DRUID: [
+    SummonerClass.DRUID: [
         [
             # tier 1
             (
@@ -389,7 +398,7 @@ ability_orders = {
             (Ability.STR,),
         ]
     ],
-    RarityBaseClass.FIGHTER: [
+    SummonerClass.FIGHTER: [
         [
             # tier 1
             (Ability.STR,),
@@ -419,7 +428,7 @@ ability_orders = {
             ),
         ],
     ],
-    RarityBaseClass.MONK: [
+    SummonerClass.MONK: [
         [
             # tier 1
             (Ability.DEX,),
@@ -453,7 +462,7 @@ ability_orders = {
             ),
         ],
     ],
-    RarityBaseClass.PALADIN: [
+    SummonerClass.PALADIN: [
         [
             # tier 1
             (
@@ -471,7 +480,7 @@ ability_orders = {
             ),
         ]
     ],
-    RarityBaseClass.RANGER: [
+    SummonerClass.RANGER: [
         [
             # tier 1
             (Ability.DEX,),
@@ -487,7 +496,7 @@ ability_orders = {
             (Ability.STR,),
         ]
     ],
-    RarityBaseClass.ROGUE: [
+    SummonerClass.ROGUE: [
         [
             # tier 1
             (
@@ -534,7 +543,7 @@ ability_orders = {
             ),
         ],
     ],
-    RarityBaseClass.SORCERER: [
+    SummonerClass.SORCERER: [
         [
             # tier 1
             (Ability.CHA,),
@@ -549,7 +558,7 @@ ability_orders = {
             (Ability.STR,),
         ]
     ],
-    RarityBaseClass.WIZARD: [
+    SummonerClass.WIZARD: [
         [
             # tier 1
             (Ability.INT,),
@@ -614,7 +623,7 @@ def _merge_tiers(tier_index: int, tiers):
                 yield tier + next_tier
 
 
-def get_ability_orders(classId: RarityBaseClass):
+def get_ability_orders(classId: SummonerClass):
     possibilities = set()
 
     for order in ability_orders[classId]:
@@ -625,7 +634,7 @@ def get_ability_orders(classId: RarityBaseClass):
     return list(possibilities)
 
 
-def get_good_random_scores(classId: RarityBaseClass):
+def get_good_random_scores(classId: SummonerClass):
     ability_order = random.choice(get_ability_orders(classId))
 
     # print("ability_order:", ability_order)

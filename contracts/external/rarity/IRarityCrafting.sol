@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity 0.8.7;
 
-interface IRarityCraft {
+interface IRarityCrafting {
     event Crafted(
         address indexed owner,
         uint check,

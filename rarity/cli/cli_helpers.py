@@ -13,7 +13,7 @@ from rarity import contracts
 def common_helpers(click_ctx):
     # TODO: add all the logic functions for the click functions to this?
     return {
-        "account": click_ctx.obj["account"],
+        "account": brownie.accounts.default,
         "brownie": brownie,
         "chain": brownie.chain,
         "Contract": brownie.Contract,
@@ -26,8 +26,8 @@ def common_helpers(click_ctx):
         "web3": brownie.web3,
         "RARITY": contracts.RARITY,
         "RARITY_ATTRIBUTES": contracts.RARITY_ATTRIBUTES,
-        "RARITY_CRAFT_1": contracts.RARITY_CRAFT_1,
         "RARITY_CRAFTING_1": contracts.RARITY_CRAFTING_1,
+        "RARITY_MATERIALS_1": contracts.RARITY_MATERIALS_1,
         "RARITY_GOLD": contracts.RARITY_GOLD,
         "RARITY_SKILLS": contracts.RARITY_SKILLS,
         "RARITY_CODEX_RANDOM": contracts.RARITY_CODEX_RANDOM,

@@ -48,6 +48,7 @@ class MinimumGasStrategy(BlockGasStrategy):
     def get_minimum_gas_price(self):
         # TODO: this is NOT the actual minimum! I don't know what is. it doesn't seem exposed
         # TODO: maybe just start real low and have brownie catch "transaction underpriced"
+        # TODO: if forked network, ganache always says 16. get the upstream instead
         return web3.eth.gasPrice * 0.8
 
     def get_gas_price(self) -> Generator[Wei, None, None]:

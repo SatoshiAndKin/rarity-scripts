@@ -1,6 +1,5 @@
 """Helpers for Fantom smart Contracts."""
-from brownie import Contract, web3
-from eth_utils import keccak, to_bytes, to_checksum_address
+from eth_utils import to_bytes
 
 
 # TODO: there is probably a better way to do this
