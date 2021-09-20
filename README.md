@@ -32,7 +32,7 @@ NOTE: Brownie's flags (like "--help") start with "--". Rarity's flags start with
 
 ### Setup Your Account
 
-    ~/bin/play-rarity.sh accounts from_mnemonic
+    ~/bin/play-rarity.sh accounts from-mnemonic
 
 Follow the prompts to setup your account. The account's key will be encrypted with a passphrase of your choosing.
 
@@ -100,7 +100,7 @@ More advanced security is planned.
 
 **UNDER CONSTRUCTION!**
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" npc create_town "$GUILD_ADDR"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" npc create-town "$GUILD_ADDR"
 
 Follow the prompts to create a town full of multiple NPCs. Only the guild can interact with the town.
 
@@ -110,7 +110,7 @@ Towns that are open for any player to interact with are planned.
 
 **UNDER CONSTRUCTION!**
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild enroll_summoner "$GUILD_ADDR" "$SUMMONER_ID"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild enroll-summoner "$GUILD_ADDR" "$SUMMONER_ID"
 
 Allow your guildmates to control your summoner. You will retain ownership of the summoner, but the guild can take it.
 
@@ -126,7 +126,7 @@ Follow the prompts to craete a summoner for your guild.
 
 **UNDER CONSTRUCTION!**
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild give_summoner "$GUILD_ADDR" "$SUMMONER_ID"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild give-summoner "$GUILD_ADDR" "$SUMMONER_ID"
 
 Give a summoner that you control to your guild.
 
@@ -134,7 +134,7 @@ Give a summoner that you control to your guild.
 
 **UNDER CONSTRUCTION!**
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild remove_summoner "$GUILD_ADDR" "$SUMMONER_ID" "$DESTINATION_ADDR"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild remove-summoner "$GUILD_ADDR" "$SUMMONER_ID" "$DESTINATION_ADDR"
 
 Please don't steal from your guildmates!
 
@@ -152,7 +152,7 @@ Depending on the size of your guild, you may need to call this multiple times pe
 
 **UNDER CONSTRUCTION!**
 
-    ~/bin/play-rarity.sh /account "$ACCOUNT" guild work_npcs "$GUILD_ADDR"
+    ~/bin/play-rarity.sh /account "$ACCOUNT" guild work-npcs "$GUILD_ADDR"
 
 This function can be called as many times per day as you are willing to pay for.
 
