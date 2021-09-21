@@ -80,6 +80,12 @@ def adventure(with_level_up) -> int:
 
     # if we want to craft something, we should not level up! 
     if with_level_up:
+        print("waiting for confirmations...")
+        # we need to wait otherwise brownie thinks levelUp will revert
+        with spinner():
+            brownie.history.wait()
+        print("CONFIRMED!")
+
         leveled_summoners = [
             s.summoner
             for s in summoners
@@ -106,7 +112,7 @@ def adventure(with_level_up) -> int:
                 materials_1_scout = [(RARITY_MATERIALS_1.scout(s), s) for s in materials_1_adventurers]
 
             materials_1_adventurers = [
-                s.summoner
+                s
                 for (i, s) in enumerate(materials_1_adventurers)
                 if materials_1_scout[i][0] > 0
             ]
@@ -123,7 +129,6 @@ def adventure(with_level_up) -> int:
     print("waiting for confirmations...")
     with spinner():
         brownie.history.wait()
-
     print("CONFIRMED!")
 
     for tx in brownie.history:
