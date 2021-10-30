@@ -24,21 +24,22 @@ def get_summoners(address, limit=1000):
     # Create a GraphQL client using the defined transport
     client = Client(transport=transport, fetch_schema_from_transport=True)
 
-    # TODO: compare graphql result with balanceOf
-    # TODO: also query level and class? anything else? gold?
-    # TODO: how should we paginate? https://thegraph.com/docs/developer/graphql-api#pagination isn't working for me
-    query = gql(
-        """
+    query = """
     {{
         summoners(where: {{owner: "{address}"}}, first: {limit}) {{
             id
-            }}
+        }}
     }}
     """.format(
-            address=address.lower(),
-            limit=limit,
-        )
+        address=address.lower(),
+        limit=limit,
     )
+    print("query:", query)
+
+    # TODO: compare graphql result with balanceOf
+    # TODO: also query level and class? anything else? gold?
+    # TODO: how should we paginate? https://thegraph.com/docs/developer/graphql-api#pagination isn't working for me
+    query = gql(query)
 
     result = client.execute(query)
 
