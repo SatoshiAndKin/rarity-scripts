@@ -18,7 +18,7 @@ Summoner = namedtuple("Summoner", ["summoner", "xp", "log", "classId", "level"])
 def get_summoners(address, limit=1000):
     # Select your transport with a defined url endpoint
     transport = RequestsHTTPTransport(
-        url="https://api.thegraph.com/subgraphs/name/eabz/rarity"
+        url="https://api.thegraph.com/subgraphs/name/rarity-adventure/rarity"
     )
 
     # Create a GraphQL client using the defined transport
