@@ -38,6 +38,7 @@ RUN --mount=type=cache,target=/root/.cache { set -eux; \
 }
 
 # install our code
+# TODO: 
 COPY . /rarity-scripts/
 RUN --mount=type=cache,target=/root/.cache { set -eux; \
     pip install \
