@@ -34,7 +34,6 @@ def get_summoners(address, limit=1000):
         address=address.lower(),
         limit=limit,
     )
-    print("query:", query)
 
     # TODO: compare graphql result with balanceOf
     # TODO: also query level and class? anything else? gold?

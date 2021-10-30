@@ -7,3 +7,4 @@ reports/
 venv/
 README.md
 TODO.md
+*.egg-info/
