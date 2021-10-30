@@ -13,7 +13,9 @@ def main(*args):
 
     # TODO: https://github.com/eth-brownie/brownie/issues/1239
     if "multicall2" not in CONFIG.active_network:
-        CONFIG.active_network["multicall2"] = "0xBAD2B082e2212DE4B065F636CA4e5e0717623d18"
+        CONFIG.active_network[
+            "multicall2"
+        ] = "0xBAD2B082e2212DE4B065F636CA4e5e0717623d18"
 
     try:
         # https://click.palletsprojects.com/en/8.0.x/exceptions/#what-if-i-don-t-want-that
@@ -36,10 +38,20 @@ def main(*args):
 @click.group()
 @click.option("/account", help="The brownie account to load")
 # TODO: click type for secure readable file
-@click.option("/passfile", help="DANGER! File that contains the account password. DANGER!")
+@click.option(
+    "/passfile", help="DANGER! File that contains the account password. DANGER!"
+)
 # TODO: option to load password from a file
-@click.option("/gas-time", default=60, help="how often to check if gas price needs to be increased")
-@click.option("/gas-extra", default="1 gwei", help="how much more than the minimum gas price to pay")
+@click.option(
+    "/gas-time",
+    default=60,
+    help="how often to check if gas price needs to be increased",
+)
+@click.option(
+    "/gas-extra",
+    default="1 gwei",
+    help="how much more than the minimum gas price to pay",
+)
 @click.pass_context
 def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
     """Command line interface for Rarity."""

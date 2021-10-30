@@ -12,14 +12,14 @@ from rarity.contracts import RARITY, RARITY_ATTRIBUTES, RARITY_SKILLS
 from rarity.ability_scores import AbilityScores, get_good_random_scores
 
 
-
 Summoner = namedtuple("Summoner", ["summoner", "xp", "log", "classId", "level"])
-
 
 
 def get_summoners(address, limit=1000):
     # Select your transport with a defined url endpoint
-    transport = RequestsHTTPTransport(url="https://api.thegraph.com/subgraphs/name/eabz/rarity")
+    transport = RequestsHTTPTransport(
+        url="https://api.thegraph.com/subgraphs/name/eabz/rarity"
+    )
 
     # Create a GraphQL client using the defined transport
     client = Client(transport=transport, fetch_schema_from_transport=True)
@@ -114,13 +114,21 @@ def summon(click_ctx):
                 print("Calculating...")
                 with spinner():
                     points_spent = RARITY_ATTRIBUTES.calculate_point_buy(
-                        strength, dexterity, constitution, intelligence, wisdom, charisma
+                        strength,
+                        dexterity,
+                        constitution,
+                        intelligence,
+                        wisdom,
+                        charisma,
                     )
 
                 if points_spent == 32:
                     break
                 if points_spent < 32:
-                    if click.confirm(f"You only spent {points_spent}/32 points. Are you sure?", default=False):
+                    if click.confirm(
+                        f"You only spent {points_spent}/32 points. Are you sure?",
+                        default=False,
+                    ):
                         break
                 else:
                     # points_spent >32
@@ -128,14 +136,17 @@ def summon(click_ctx):
 
                 print("Try again...")
 
-            ability_scores = AbilityScores(strength, dexterity, constitution, intelligence, wisdom, charisma)
+            ability_scores = AbilityScores(
+                strength, dexterity, constitution, intelligence, wisdom, charisma
+            )
 
     # pick skills?
     skills = [0] * 36
     if click.confirm("Set skills?", default=True):
         print(
             click.style(
-                "Sorry! Setting skills is not yet supported. You'll have to use the console to do that.", fg="yellow"
+                "Sorry! Setting skills is not yet supported. You'll have to use the console to do that.",
+                fg="yellow",
             )
         )
 

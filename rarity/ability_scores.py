@@ -314,7 +314,9 @@ MAX_MAX_DUMP_STATS = 4
 # TODO: range on this? sometimes 2 or 3 odds can be good (racial ability mods and magic items)
 MAX_ODD_SCORES = 1
 
-AttributeBounds = namedtuple("AbilityBounds", ["min_dump_stats", "max_dump_stats", "ability_rankings"])
+AttributeBounds = namedtuple(
+    "AbilityBounds", ["min_dump_stats", "max_dump_stats", "ability_rankings"]
+)
 
 
 # TODO: load these out of a config file or something
@@ -570,7 +572,11 @@ ability_orders = {
     ],
 }
 
-specialized = {"Market LP": NotImplemented, "Craft I Farmer": NotImplemented, "Craftsman I": NotImplemented}
+specialized = {
+    "Market LP": NotImplemented,
+    "Craft I Farmer": NotImplemented,
+    "Craftsman I": NotImplemented,
+}
 
 
 def ability_score_modifier(score):
@@ -610,7 +616,9 @@ def rank_ability_permutations(dump_stats=0):
         ranked[rank].append(array)
 
     # sort the dict
-    return {k: v for k, v in sorted(ranked.items(), key=lambda item: item[1], reverse=True)}
+    return {
+        k: v for k, v in sorted(ranked.items(), key=lambda item: item[1], reverse=True)
+    }
 
 
 def _merge_tiers(tier_index: int, tiers):

@@ -1,8 +1,9 @@
-import click
+import sys
 from collections import namedtuple
 from enum import IntEnum
 
 import brownie
+import click
 from brownie import Contract, multicall, web3
 from lazy_load import lazy_func
 from eth_utils import keccak, to_bytes, to_checksum_address
@@ -40,7 +41,18 @@ def calculate_create2_address(sender: str, initcode: str, salt: str = None) -> s
 
 
 def get_or_create(account, contract, constructor_args=None, salt=None) -> Contract:
-    """Use CREATE2 and a set deployer address to deploy a contract with a deterministic address."""
+    """Use CREATE2 and a set deployer address to deploy a contract with a deterministic address.
+
+    TODO: So apparently mac and linux will sometimes generate different bytecode. which means different addresses
+    Deployment from Mac: 0xbEF7e8f040e93b5E90ADB4E3DbF3527470b63012
+    Deployment from Linux: 0x708BdD76A707Ff0650C3Ae14Bd6FD96eEC78256C
+
+    because of this, i think we should always deploy from a common image (for now an ubuntu docker container)
+    """
+    if sys.platform != "linux":
+        print("Sorry, only Linux is supported. Install docker.")
+        sys.exit(1)
+
     account = account or brownie.accounts.default
 
     if constructor_args is None:
@@ -49,13 +61,23 @@ def get_or_create(account, contract, constructor_args=None, salt=None) -> Contra
     contract_initcode = contract.deploy.encode_input(*constructor_args)
 
     # SingletonFactory doesn't work on FTM. We use Andre's factory instead
+    # actually, i think it does work but my gas estimates were just wrong. oh well. this works
     create2_deployer = Contract("0x54f5a04417e29ff5d7141a6d33cb286f50d5d50e")
 
-    contract_address = calculate_create2_address(str(create2_deployer.address), contract_initcode, salt=salt)
+    contract_address = calculate_create2_address(
+        str(create2_deployer.address), contract_initcode, salt=salt
+    )
 
     if web3.eth.get_code(contract_address).hex() == "0x":
+        # estimate gaas
+        estimated_gas = contract.deploy.estimate_gas(*constructor_args) + 2300
+
+        gas_limit = estimated_gas * brownie.network.main.gas_buffer()
+
         # the contract does not exist yet
-        create2_deployer.deploy(contract_initcode, salt, {"from": account})
+        create2_deployer.deploy(
+            contract_initcode, salt, {"from": account, "gas_limit": gas_limit}
+        )
         print(f"Created {contract._name} at {contract_address}\n")
     else:
         # the contract has already been deployed

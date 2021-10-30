@@ -5,14 +5,14 @@ Minimum gas price strategy.
 import time
 from typing import Generator
 
-from brownie import chain, web3
+from brownie import chain, network, web3
 from brownie.convert import Wei
 from brownie.network.gas.bases import BlockGasStrategy
 
 
 def is_forked_network() -> bool:
-    # TODO: copy this from argobytes
-    return False
+    # TODO: this isn't very durable? check if we can snapshot?
+    return network.show_active().endswith("-fork")
 
 
 class MinimumGasStrategy(BlockGasStrategy):

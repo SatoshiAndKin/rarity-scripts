@@ -28,9 +28,15 @@ if [ ! -d "$build_dir" ]; then
     mkdir -p "$build_dir"
 fi
 
+env_file="$RARITY_HOME/env"
+if [ ! -e "$env_file" ]; then
+    touch "$env_file"
+fi
+
 exec docker run \
     --rm -it \
     -v "$RARITY_HOME/:/root/" \
+    --env-file "$env_file" \
     "bwstitt/rarity:$RARITY_TAG" \
     "$@" \
 ;

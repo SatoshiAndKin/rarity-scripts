@@ -28,7 +28,9 @@ def adventure(with_level_up) -> int:
 
     rarity_balance = RARITY.balanceOf(account_address)
     if rarity_balance != len(summoners):
-        print(f"WARNING! Only {len(summoners)}/{rarity_balance} summoner ids are known!")
+        print(
+            f"WARNING! Only {len(summoners)}/{rarity_balance} summoner ids are known!"
+        )
 
     # Version numbering is going to be tedious. so is approving every time a new contract comes out
     # get our clone proxies deployed on FTM and then approve that instead?
@@ -37,18 +39,28 @@ def adventure(with_level_up) -> int:
     with spinner():
         with brownie.multicall:
             approvals = [(RARITY.getApproved(s.summoner), s) for s in summoners]
-            adventurers_logs = [(RARITY.adventurers_log(s.summoner), s) for s in summoners]
-            materials_1_logs = [(RARITY_MATERIALS_1.adventurers_log(s.summoner), s) for s in summoners]
+            adventurers_logs = [
+                (RARITY.adventurers_log(s.summoner), s) for s in summoners
+            ]
+            materials_1_logs = [
+                (RARITY_MATERIALS_1.adventurers_log(s.summoner), s) for s in summoners
+            ]
 
     print("Setting up approvals...")
     if not RARITY.isApprovedForAll.call(account_address, RARITY_ACTION_V2):
-        RARITY.setApprovalForAll(RARITY_ACTION_V2, True, {"from": account_address, "required_confs": 0})
+        RARITY.setApprovalForAll(
+            RARITY_ACTION_V2, True, {"from": account_address, "required_confs": 0}
+        )
 
     # approvalForAll doesn't work on all contracts
     # TODO: these approvals aren't always needed
     for approved, summoner in approvals:
         if approved != RARITY_ACTION_V2.address:
-            RARITY.approve(RARITY_ACTION_V2, summoner.summoner, {"from": account_address, "required_confs": 0})
+            RARITY.approve(
+                RARITY_ACTION_V2,
+                summoner.summoner,
+                {"from": account_address, "required_confs": 0},
+            )
 
     print("waiting for confirmations...")
     # we want our approvals confirmed before we do other transactions, otherwise we can get false reverts
@@ -58,7 +70,9 @@ def adventure(with_level_up) -> int:
     # calculate next run time based off the adventurers logs
     now = brownie.chain[-1].timestamp
     next_run = now + 86400
-    for (next_adventure_timestamp, _) in itertools.chain(adventurers_logs, materials_1_logs):
+    for (next_adventure_timestamp, _) in itertools.chain(
+        adventurers_logs, materials_1_logs
+    ):
         if now < next_adventure_timestamp:
             next_run = next_adventure_timestamp + 1
             break
@@ -78,7 +92,7 @@ def adventure(with_level_up) -> int:
         for a in adventurers:
             new_xp[a] = 250e18
 
-    # if we want to craft something, we should not level up! 
+    # if we want to craft something, we should not level up!
     if with_level_up:
         print("waiting for confirmations...")
         # we need to wait otherwise brownie thinks levelUp will revert
@@ -91,7 +105,9 @@ def adventure(with_level_up) -> int:
             for s in summoners
             if s.xp + new_xp.get(s.summoner, 0) >= get_xp_required(s.level)
         ]
-        print(f"{account_address} has {len(leveled_summoners)} summoners ready for leveling up")
+        print(
+            f"{account_address} has {len(leveled_summoners)} summoners ready for leveling up"
+        )
         if leveled_summoners:
             group_size = len(leveled_summoners)
             for a in grouper(leveled_summoners, group_size, None):
@@ -109,7 +125,9 @@ def adventure(with_level_up) -> int:
         print("Scouting for Materials 1...")
         with spinner():
             with brownie.multicall:
-                materials_1_scout = [(RARITY_MATERIALS_1.scout(s), s) for s in materials_1_adventurers]
+                materials_1_scout = [
+                    (RARITY_MATERIALS_1.scout(s), s) for s in materials_1_adventurers
+                ]
 
             materials_1_adventurers = [
                 s
@@ -117,14 +135,20 @@ def adventure(with_level_up) -> int:
                 if materials_1_scout[i][0] > 0
             ]
 
-        print(f"{account_address} has {len(materials_1_adventurers)} summoners ready for collecting materials 1")
+        print(
+            f"{account_address} has {len(materials_1_adventurers)} summoners ready for collecting materials 1"
+        )
 
         if materials_1_adventurers:
             group_size = len(materials_1_adventurers)
             for a in grouper(materials_1_adventurers, group_size, None):
-                RARITY_ACTION_V2.distantAdventure(list(filter(None, a)), RARITY_MATERIALS_1, {"required_confs": 0})
+                RARITY_ACTION_V2.distantAdventure(
+                    list(filter(None, a)), RARITY_MATERIALS_1, {"required_confs": 0}
+                )
     else:
-        print(f"{account_address} has {len(materials_1_adventurers)} summoners ready for collecting materials 1")
+        print(
+            f"{account_address} has {len(materials_1_adventurers)} summoners ready for collecting materials 1"
+        )
 
     print("waiting for confirmations...")
     with spinner():
