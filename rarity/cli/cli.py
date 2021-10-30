@@ -55,7 +55,7 @@ def main(*args):
 @click.pass_context
 def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
     """Command line interface for Rarity."""
-    assert brownie.chain.id == 250, "not Fantom network!"
+    assert brownie.chain.id in [250, 31337], "not Fantom or forked network!"
 
     print("\nConnected to", brownie.web3.provider.endpoint_uri)
 
