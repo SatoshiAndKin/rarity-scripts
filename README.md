@@ -18,6 +18,8 @@ Copy and paste the following into your terminal:
 
 To upgrade, run the above command again.
 
+Add environment variables (such as FTMSCAN_TOKEN) to `~/.rarity-scripts/.env`.
+
 ## Usage
 
 Run the following in your terminal:
