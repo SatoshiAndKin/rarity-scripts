@@ -32,7 +32,6 @@ RUN --mount=type=cache,target=/root/.cache { set -eux; \
 COPY requirements.txt /rarity-scripts/
 RUN --mount=type=cache,target=/root/.cache { set -eux; \
     pip install \
-        --use-feature=in-tree-build \
         --disable-pip-version-check \
         -r /rarity-scripts/requirements.txt \
     ; \
@@ -42,7 +41,6 @@ RUN --mount=type=cache,target=/root/.cache { set -eux; \
 COPY . /rarity-scripts/
 RUN --mount=type=cache,target=/root/.cache { set -eux; \
     pip install \
-        --use-feature=in-tree-build \
         --disable-pip-version-check \
         -r /rarity-scripts/requirements.txt -e /rarity-scripts/ \
     ; \
