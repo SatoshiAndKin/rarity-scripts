@@ -2,6 +2,7 @@ import click
 from click_spinner import spinner
 
 from rarity.cli import rarity_cli
+from rarity.gas_strategy import setup_automatic_gas
 
 
 @rarity_cli.group()

@@ -45,7 +45,13 @@ class RecommendedGasStrategy(BlockGasStrategy):
         self.extra = Fixed(extra)
         self.max_gas_price = max_gas_price
 
-        print("Scaling recommended gas by", scale_recommended, "and adding", self.extra, "wei")
+        print(
+            "Scaling recommended gas by",
+            scale_recommended,
+            "and adding",
+            self.extra,
+            "wei",
+        )
         self.scale_recommended = scale_recommended
 
     def __str__(self) -> str:
