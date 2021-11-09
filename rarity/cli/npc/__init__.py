@@ -12,6 +12,6 @@ def npc():
 @click.pass_context
 def summon(ctx):
     """Summon a group of non-player characters."""
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     raise NotImplementedError

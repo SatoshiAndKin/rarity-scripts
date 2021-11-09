@@ -15,7 +15,7 @@ def adventure(ctx):
     """Send all your player characters on adventures."""
     from rarity.adventure import adventure
 
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     # TODO: make leveling optional
     adventure(True)
@@ -28,7 +28,7 @@ def idle_adventure(ctx):
     from rarity.adventure import adventure
     import time
 
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     while True:
         try:
@@ -48,6 +48,6 @@ def summon(ctx):
     """Summon a new player character."""
     from rarity.summoner import summon
 
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     summon(ctx)

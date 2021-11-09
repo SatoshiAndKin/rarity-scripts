@@ -3,7 +3,7 @@ import brownie
 import click
 from brownie._config import CONFIG
 
-from rarity.gas_strategy import MinimumGasStrategy
+from rarity.gas_strategy import setup_automatic_gas
 
 from .cli_helpers import common_helpers, lazy_account
 
@@ -59,26 +59,8 @@ def rarity_cli(ctx, account, gas_time, gas_extra, passfile):
 
     print("\nConnected to", brownie.web3.provider.endpoint_uri)
 
-    ctx.ensure_object(dict)
-
+    # do this lazily because not all functions will use the account
     brownie.accounts.default = lazy_account(account, passfile)
-
-    # do gas strategy setup in a function so we can only call it if is needed
-    def setup_gas_strat():
-        last_block = brownie.chain[-1]
-        block_human_time = arrow.get(last_block.timestamp).humanize()
-        print(f"Last block: {last_block.number:_} @ {block_human_time}\n")
-
-        gas_strat = MinimumGasStrategy(gas_time, gas_extra)
-
-        print(gas_strat, "\n")
-        brownie.network.gas_price(gas_strat)
-
-        ctx.obj["gas_strat"] = gas_strat
-
-        del ctx.obj["setup_gas_strat"]
-
-    ctx.obj["setup_gas_strat"] = setup_gas_strat
 
 
 @rarity_cli.command()
@@ -87,7 +69,7 @@ def console(ctx):
     """Open an interactive console."""
     import IPython
 
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     IPython.start_ipython(argv=[], user_ns=common_helpers(ctx))
 
@@ -98,7 +80,7 @@ def console(ctx):
 def run(ctx, python_code):
     """Exec arbitrary (and hopefully audited!) python code. Be careful with this!"""
 
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     print(eval(python_code, {}, common_helpers(ctx)))
 
@@ -109,6 +91,6 @@ def run(ctx, python_code):
 def run_file(ctx, python_file):
     """Exec arbitrary (and hopefully audited!) python files. Be careful with this!"""
 
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     print(eval(python_file.read(), {}, common_helpers(ctx)))

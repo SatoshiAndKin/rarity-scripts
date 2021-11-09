@@ -11,7 +11,7 @@ def dungeon():
 @click.pass_context
 def create(ctx):
     """Create an adventure."""
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     raise NotImplementedError
 
@@ -20,7 +20,7 @@ def create(ctx):
 @click.pass_context
 def scout(ctx):
     """Enter an adventure."""
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     raise NotImplementedError
 
@@ -29,7 +29,7 @@ def scout(ctx):
 @click.pass_context
 def adventure(ctx):
     """Enter an adventure."""
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     raise NotImplementedError
 
@@ -38,6 +38,6 @@ def adventure(ctx):
 @click.pass_context
 def play(ctx):
     """Play the current adventure."""
-    ctx.obj["setup_gas_strat"]()
+    setup_automatic_gas()
 
     raise NotImplementedError
