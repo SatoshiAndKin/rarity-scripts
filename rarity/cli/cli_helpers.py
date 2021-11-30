@@ -47,8 +47,9 @@ def lazy_account(account_name, password_name):
         account_name = click.prompt("Account")
 
     if password_name:
+        print(f"Loading password from {password_name}...")
         with open(password_name) as f:
-            password = f.read()
+            password = f.read().rstrip()
     else:
         # i wanted to use click options for the password, but brownie will prompt
         password = None
