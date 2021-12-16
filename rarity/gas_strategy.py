@@ -58,6 +58,16 @@ class RecommendedGasStrategy(BlockGasStrategy):
         pretty_gas_price = next(self.get_gas_price()) / Fixed("1e9")
         return f"RecommendedGasStrategy recommends {pretty_gas_price} gwei checking after ~{self.block_time:.0f} seconds ({self.duration} blocks)"
 
+
+    def check_recommendation(self):
+        if not self.max_gas_price:
+            return
+
+        new_recommendation = self.get_recommended_gas_price()
+
+        if self.max_gas_price < new_recommendation:
+            raise ValueError(f"Recommended gas ({new_recommendation/Decimal(1e9)} gwei) greater than allowed maximum ({self.max_gas_price/Decimal(1e9)} gwei)!")
+
     def get_recommended_gas_price(self):
         # TODO: on fantom, i actually want the minimum! I don't know how to get that. it doesn't seem exposed
         # TODO: maybe just start low and have brownie catch "transaction underpriced"
@@ -111,8 +121,26 @@ def setup_automatic_gas(max_gas_price=None) -> Fixed:
 
         # we don't want to base the max off what the node told us. we don't want absurdly high prices to surprie us!
 
+
+        if chain.id == 250:
+            scale_recommended = 1.01
+        else:
+            scale_recommended = 0.8
+
+        # TODO: let the user customize these
+        gas_strat = RecommendedGasStrategy(
+            time_duration=30,
+            extra="1 gwei",
+            max_gas_price=max_gas_price,
+            scale_recommended=scale_recommended,
+        )
+
+        print(gas_strat)
+        # if the current recommended is > max, exit now
+        gas_strat.check_recommendation()
+
         if chain.id == 1:
-            # if the chain supports EIP-1559, use priority fee
+            # if the chain supports EIP-1559, instead of gas_start, use priority fee
 
             print(
                 f"REAL network with EIP-1559. setting priority_fee to 1.4 gwei and max to {int(max_gas_price)/int(1e9):_} gwei"
@@ -120,6 +148,8 @@ def setup_automatic_gas(max_gas_price=None) -> Fixed:
 
             # TODO: if using eden, we want the minimum priority fee included in the last few blocks
             network.priority_fee("1.4 gwei")
+
+            # TODO: if this is way way over the current recommended, pick something lower?
             network.max_fee(max_gas_price)
 
             # clear the other gas price settings
@@ -130,20 +160,6 @@ def setup_automatic_gas(max_gas_price=None) -> Fixed:
                 f"REAL network without EIP-1559. setting max to {int(max_gas_price)/int(1e9):_} gwei"
             )
 
-            if chain.id == 250:
-                scale_recommended = 1.01
-            else:
-                scale_recommended = 0.8
-
-            # TODO: let the user customize these
-            gas_strat = RecommendedGasStrategy(
-                time_duration=30,
-                extra="1 gwei",
-                max_gas_price=max_gas_price,
-                scale_recommended=scale_recommended,
-            )
-
-            print(gas_strat)
             network.gas_price(gas_strat)
 
             # clear the eip-1559 settings
