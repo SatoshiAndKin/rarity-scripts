@@ -1,6 +1,7 @@
 """
 Recommended gas price strategy.
 """
+import os
 import time
 from decimal import Decimal
 from typing import Generator
@@ -96,9 +97,9 @@ class RecommendedGasStrategy(BlockGasStrategy):
 
 
 def setup_automatic_gas(max_gas_price=None) -> Fixed:
+    # we don't want to base the max off what the node told us. we don't want absurdly high prices to surprie us!
     if max_gas_price is None:
-        max_gas_price = "300 gwei"
-
+        max_gas_price = os.environ.get("MAX_GAS", "300 gwei")
     max_gas_price = Fixed(max_gas_price)
 
     # reverting out of gas is always terribly sad
@@ -118,8 +119,6 @@ def setup_automatic_gas(max_gas_price=None) -> Fixed:
         network.priority_fee(None)
     else:
         # TODO: if the current recommended is > max, exit now
-
-        # we don't want to base the max off what the node told us. we don't want absurdly high prices to surprie us!
 
 
         if chain.id == 250:
